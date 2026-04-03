@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-04-03T02:43:41Z",
+  "generated_at": "2026-04-03T03:01:10Z",
   "team_health": "red",
   "total_progress": {
     "done": 5,
-    "total": 116,
-    "percent": 4
+    "total": 24,
+    "percent": 20
   },
   "active_members": {
     "active": 0,
@@ -18,10 +18,6 @@
     },
     {
       "type": "error",
-      "message": "CRM System v2.0 -: 92件のタスクが全て未着手です"
-    },
-    {
-      "type": "error",
       "message": "LP複製・アップロード: 9件のタスクが全て未着手です"
     }
   ],
@@ -30,38 +26,7 @@
       "name": "crm_analysis",
       "tools": [
         {
-          "name": "CRM System v2.0 -",
-          "file": "REQUIREMENTS.md",
-          "done": 0,
-          "total": 92,
-          "status": "red",
-          "assignee": null,
-          "remaining_tasks": [
-            "Supabase Auth導入（メール/パスワード認証）",
-            "ロールベースアクセス制御（RBAC: 管理者/マネージャー/営業/CS）",
-            "セッション管理（JWT + リフレッシュトークン）",
-            "2FA（二要素認証）オプション",
-            "APIキー認証（n8n webhook保護）",
-            "CSRF/XSS対策強化",
-            "Supabase PostgreSQL へのデータ移行",
-            "リレーショナルスキーマ設計（正規化）",
-            "Row Level Security (RLS) 設定",
-            "インデックス最適化",
-            "データバックアップ自動化",
-            "Supabase Realtime でデータ変更通知",
-            "WebSocket によるリアルタイムダッシュボード更新",
-            "チーム間コラボレーション（同時編集検知）",
-            "LINEメッセージのリアルタイム受信通知",
-            "ブラウザPush通知（Service Worker）",
-            "モバイルレスポンシブ完全対応",
-            "ダークモード",
-            "ページネーション + 仮想スクロール（大量データ対応）",
-            "キーボードショートカット"
-          ],
-          "completed_tasks": []
-        },
-        {
-          "name": "CRM System v2.1 - 売上照合 + セキュリティ強化",
+          "name": "売上照合 + セキュリティ強化 (v2.1)",
           "file": "REQUIREMENTS_v2.1_payment_matching.md",
           "done": 0,
           "total": 0,
@@ -71,7 +36,7 @@
           "completed_tasks": []
         },
         {
-          "name": "CRM System v2.2 - 顧客管理モジュール",
+          "name": "顧客管理モジュール (v2.2)",
           "file": "REQUIREMENTS_v2.2_customer_management.md",
           "done": 0,
           "total": 0,
@@ -81,17 +46,7 @@
           "completed_tasks": []
         },
         {
-          "name": "CRM System v2.3 -",
-          "file": "REQUIREMENTS_v2.md",
-          "done": 0,
-          "total": 0,
-          "status": "unknown",
-          "assignee": null,
-          "remaining_tasks": [],
-          "completed_tasks": []
-        },
-        {
-          "name": "CRM System v3.0 -",
+          "name": "CRM System (v3.0)",
           "file": "REQUIREMENTS_v3.md",
           "done": 0,
           "total": 0,
@@ -156,7 +111,7 @@
           "completed_tasks": []
         },
         {
-          "name": "予実シート自動化",
+          "name": "予実シート自動化 (v4)",
           "file": "02_yojitsu_auto.md",
           "done": 5,
           "total": 15,
@@ -368,7 +323,7 @@
       0,
       0,
       0,
-      4
+      20
     ],
     "commits": [
       0,
