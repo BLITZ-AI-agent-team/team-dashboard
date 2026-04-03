@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-04-03T05:25:05Z",
+  "generated_at": "2026-04-03T05:57:54Z",
   "team_health": "red",
   "total_progress": {
-    "done": 8,
+    "done": 19,
     "total": 122,
-    "percent": 6
+    "percent": 15
   },
   "active_members": {
     "active": 0,
     "total": 4
   },
-  "recent_commit_count": 12,
+  "recent_commit_count": 16,
   "alerts": [
     {
       "type": "warning",
@@ -26,15 +26,7 @@
     },
     {
       "type": "error",
-      "message": "業務指示書 日次シート自動作成: 5件のタスクが全て未着手です"
-    },
-    {
-      "type": "error",
       "message": "広告KPI共通分析モジュール: 8件のタスクが全て未着手です"
-    },
-    {
-      "type": "error",
-      "message": "LP複製・アップロード: 15件のタスクが全て未着手です"
     },
     {
       "type": "error",
@@ -111,18 +103,18 @@
         {
           "name": "業務指示書 日次シート自動作成",
           "file": "requirements-daily-report.md",
-          "done": 0,
+          "done": 5,
           "total": 5,
-          "status": "red",
+          "status": "green",
           "assignee": null,
-          "remaining_tasks": [
+          "remaining_tasks": [],
+          "completed_tasks": [
             "シートコピー（テンプレート → 当日分）の実装",
             "Meta API / 管理画面からのデータ取得の実装",
             "データ書き込み（所定セルへの自動記入）の実装",
             "完了通知の実装",
             "E2Eテスト"
-          ],
-          "completed_tasks": []
+          ]
         },
         {
           "name": "広告KPI共通分析モジュール",
@@ -146,9 +138,9 @@
         {
           "name": "LP複製・アップロード",
           "file": "requirements-lp-deploy.md",
-          "done": 0,
+          "done": 6,
           "total": 15,
-          "status": "red",
+          "status": "yellow",
           "assignee": null,
           "remaining_tasks": [
             "FileZillaの「既存ファイルを上書きする場合は確認する」設定がONになっているか確認",
@@ -159,15 +151,16 @@
             "LPデータフォルダ（zip等）を実行者に渡す",
             "FileZillaの接続情報（ホスト・ユーザー名・パスワード・ポート）を実行者に渡す ★",
             "広告運用レポートのURL・記入箇所を確認し、実行者に伝える ★",
-            "FileZillaの上書き確認設定がONになっているか実行者に確認させる",
+            "FileZillaの上書き確認設定がONになっているか実行者に確認させる"
+          ],
+          "completed_tasks": [
             "確認待ち事項（★マーク）の解消",
             "LP複製ロジック（テンプレートLP → 新LP）の実装",
             "FTP/SFTP アップロードの実装",
             "URL生成・確認フローの実装",
             "広告運用レポートへのURL書き込みの実装",
             "E2Eテスト"
-          ],
-          "completed_tasks": []
+          ]
         },
         {
           "name": "Meta広告操作エージェントモジュール",
@@ -335,6 +328,31 @@
       ]
     },
     {
+      "name": "direction-tool",
+      "tools": [
+        {
+          "name": "AI Debate Log - Direction",
+          "file": "archive/debates/2026-03-31-direction-requirements/debate-log.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "Direction -",
+          "file": "archive/REQUIREMENTS.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        }
+      ]
+    },
+    {
       "name": "crm_analysis",
       "tools": [
         {
@@ -360,31 +378,6 @@
         {
           "name": "CRM System (v3.0)",
           "file": "REQUIREMENTS_v3.md",
-          "done": 0,
-          "total": 0,
-          "status": "unknown",
-          "assignee": null,
-          "remaining_tasks": [],
-          "completed_tasks": []
-        }
-      ]
-    },
-    {
-      "name": "direction-tool",
-      "tools": [
-        {
-          "name": "AI Debate Log - Direction",
-          "file": "docs/debates/2026-03-31-direction-requirements/debate-log.md",
-          "done": 0,
-          "total": 0,
-          "status": "unknown",
-          "assignee": null,
-          "remaining_tasks": [],
-          "completed_tasks": []
-        },
-        {
-          "name": "Direction -",
-          "file": "docs/REQUIREMENTS.md",
           "done": 0,
           "total": 0,
           "status": "unknown",
@@ -463,6 +456,64 @@
     }
   ],
   "recent_commits": [
+    {
+      "author": {
+        "login": "kawasumishuhei0117",
+        "id": 260336269,
+        "node_id": "U_kgDOD4RqjQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/260336269?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/kawasumishuhei0117",
+        "html_url": "https://github.com/kawasumishuhei0117",
+        "followers_url": "https://api.github.com/users/kawasumishuhei0117/followers",
+        "following_url": "https://api.github.com/users/kawasumishuhei0117/following{/other_user}",
+        "gists_url": "https://api.github.com/users/kawasumishuhei0117/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/kawasumishuhei0117/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/kawasumishuhei0117/subscriptions",
+        "organizations_url": "https://api.github.com/users/kawasumishuhei0117/orgs",
+        "repos_url": "https://api.github.com/users/kawasumishuhei0117/repos",
+        "events_url": "https://api.github.com/users/kawasumishuhei0117/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/kawasumishuhei0117/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": "blitz-ad",
+      "message": "",
+      "date": "",
+      "files": 3,
+      "additions": 19,
+      "deletions": 19
+    },
+    {
+      "author": {
+        "login": "kawasumishuhei0117",
+        "id": 260336269,
+        "node_id": "U_kgDOD4RqjQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/260336269?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/kawasumishuhei0117",
+        "html_url": "https://github.com/kawasumishuhei0117",
+        "followers_url": "https://api.github.com/users/kawasumishuhei0117/followers",
+        "following_url": "https://api.github.com/users/kawasumishuhei0117/following{/other_user}",
+        "gists_url": "https://api.github.com/users/kawasumishuhei0117/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/kawasumishuhei0117/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/kawasumishuhei0117/subscriptions",
+        "organizations_url": "https://api.github.com/users/kawasumishuhei0117/orgs",
+        "repos_url": "https://api.github.com/users/kawasumishuhei0117/repos",
+        "events_url": "https://api.github.com/users/kawasumishuhei0117/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/kawasumishuhei0117/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": "blitz-ad",
+      "message": "",
+      "date": "",
+      "files": 3,
+      "additions": 103,
+      "deletions": 62
+    },
     {
       "author": {
         "login": "kawasumishuhei0117",
@@ -597,32 +648,61 @@
     },
     {
       "author": {
-        "login": "takahashi-saika-maker",
-        "id": 264969388,
-        "node_id": "U_kgDOD8scrA",
-        "avatar_url": "https://avatars.githubusercontent.com/u/264969388?v=4",
+        "login": "yamamoto-kosuke-ai",
+        "id": 247279877,
+        "node_id": "U_kgDODr0xBQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/247279877?v=4",
         "gravatar_id": "",
-        "url": "https://api.github.com/users/takahashi-saika-maker",
-        "html_url": "https://github.com/takahashi-saika-maker",
-        "followers_url": "https://api.github.com/users/takahashi-saika-maker/followers",
-        "following_url": "https://api.github.com/users/takahashi-saika-maker/following{/other_user}",
-        "gists_url": "https://api.github.com/users/takahashi-saika-maker/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/takahashi-saika-maker/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/takahashi-saika-maker/subscriptions",
-        "organizations_url": "https://api.github.com/users/takahashi-saika-maker/orgs",
-        "repos_url": "https://api.github.com/users/takahashi-saika-maker/repos",
-        "events_url": "https://api.github.com/users/takahashi-saika-maker/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/takahashi-saika-maker/received_events",
+        "url": "https://api.github.com/users/yamamoto-kosuke-ai",
+        "html_url": "https://github.com/yamamoto-kosuke-ai",
+        "followers_url": "https://api.github.com/users/yamamoto-kosuke-ai/followers",
+        "following_url": "https://api.github.com/users/yamamoto-kosuke-ai/following{/other_user}",
+        "gists_url": "https://api.github.com/users/yamamoto-kosuke-ai/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/yamamoto-kosuke-ai/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/yamamoto-kosuke-ai/subscriptions",
+        "organizations_url": "https://api.github.com/users/yamamoto-kosuke-ai/orgs",
+        "repos_url": "https://api.github.com/users/yamamoto-kosuke-ai/repos",
+        "events_url": "https://api.github.com/users/yamamoto-kosuke-ai/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/yamamoto-kosuke-ai/received_events",
         "type": "User",
         "user_view_type": "public",
         "site_admin": false
       },
-      "repo": "crm_analysis",
+      "repo": "direction-tool",
       "message": "",
       "date": "",
-      "files": 37,
-      "additions": 37720,
-      "deletions": 159
+      "files": 12,
+      "additions": 1024,
+      "deletions": 0
+    },
+    {
+      "author": {
+        "login": "yamamoto-kosuke-ai",
+        "id": 247279877,
+        "node_id": "U_kgDODr0xBQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/247279877?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/yamamoto-kosuke-ai",
+        "html_url": "https://github.com/yamamoto-kosuke-ai",
+        "followers_url": "https://api.github.com/users/yamamoto-kosuke-ai/followers",
+        "following_url": "https://api.github.com/users/yamamoto-kosuke-ai/following{/other_user}",
+        "gists_url": "https://api.github.com/users/yamamoto-kosuke-ai/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/yamamoto-kosuke-ai/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/yamamoto-kosuke-ai/subscriptions",
+        "organizations_url": "https://api.github.com/users/yamamoto-kosuke-ai/orgs",
+        "repos_url": "https://api.github.com/users/yamamoto-kosuke-ai/repos",
+        "events_url": "https://api.github.com/users/yamamoto-kosuke-ai/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/yamamoto-kosuke-ai/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": "direction-tool",
+      "message": "",
+      "date": "",
+      "files": 1,
+      "additions": 56,
+      "deletions": 0
     },
     {
       "author": {
@@ -689,7 +769,7 @@
       0,
       0,
       0,
-      6
+      15
     ],
     "commits": [
       0,
@@ -698,7 +778,7 @@
       0,
       0,
       0,
-      12
+      16
     ]
   }
 }
