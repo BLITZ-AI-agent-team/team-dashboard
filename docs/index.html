@@ -3,432 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLITZ AI Agent Team - Dashboard</title>
+    <title>BLITZ — Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', system-ui, sans-serif; }
-        .progress-bar { transition: width 0.8s ease-in-out; }
-        #auth-screen { backdrop-filter: blur(8px); }
-        .card { transition: transform 0.15s; }
-        .card:hover { transform: translateY(-1px); }
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .task-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .task-detail.open { max-height: 800px; transition: max-height 0.5s ease-in; }
-        .tool-row { cursor: pointer; }
-        .tool-row:hover { background-color: #f9fafb; }
-        .chevron { transition: transform 0.2s; }
-        .chevron.open { transform: rotate(90deg); }
+        *{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+        :root{--bg:#f8f6f1;--surface:#ffffff;--surface2:#f3f0eb;--border:#e8e4dd;--border-light:#d6d1c9;--text:#1a1a1a;--text2:#6b6560;--text3:#9c9590;--accent:#7c6a4f}
+        body{background:var(--bg);color:var(--text)}
+        .sidebar{width:240px;border-right:1px solid var(--border);height:100vh;position:fixed;top:0;left:0;overflow-y:auto}
+        .main-content{margin-left:240px}
+        .nav-item{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:6px;font-size:13px;color:var(--text3);cursor:pointer;transition:all .15s}
+        .nav-item:hover,.nav-item.active{background:var(--surface);color:var(--text)}
+        .nav-item.active{color:var(--text);font-weight:500}
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px}
+        .stat-card:hover{border-color:var(--border-light)}
+        .stat-value{font-size:32px;font-weight:800;letter-spacing:-0.02em;line-height:1}
+        .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+        .project-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+        .project-card:hover{border-color:var(--border-light)}
+        .tool-item{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+        .tool-item:hover{background:rgba(0,0,0,0.02)}
+        .tool-item:last-child{border-bottom:none}
+        .progress-thin{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+        .progress-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+        .badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px}
+        .member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.04)}
+        .member-row:last-child{border-bottom:none}
+        .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+        .commit-row{padding:12px 16px;border-bottom:1px solid rgba(0,0,0,0.04);transition:background .15s}
+        .commit-row:hover{background:rgba(0,0,0,0.02)}
+        .commit-row:last-child{border-bottom:none}
+        .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+        .task-detail{max-height:0;overflow:hidden;transition:max-height .3s cubic-bezier(.4,0,.2,1)}
+        .task-detail.open{max-height:600px}
+        .alert-bar{border-left:3px solid;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;display:flex;align-items:center;gap:8px}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeIn .4s ease both}
+        .fade-d1{animation-delay:.05s}.fade-d2{animation-delay:.1s}.fade-d3{animation-delay:.15s}.fade-d4{animation-delay:.2s}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+        .stat-card{box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+        .project-card{box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+        .nav-item:hover,.nav-item.active{background:var(--surface2)}
     </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        rag: { green: '#22c55e', yellow: '#eab308', red: '#ef4444' }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
 
-<!-- パスワード認証画面 -->
-<div id="auth-screen" class="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 w-96 text-center">
-        <div class="text-4xl mb-4">🔒</div>
-        <h2 class="text-xl font-bold text-gray-800 mb-2">Team Dashboard</h2>
-        <p class="text-gray-500 text-sm mb-6">社内メンバー専用です</p>
-        <input id="password-input" type="password" placeholder="パスワードを入力"
-               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none mb-4"
-               onkeydown="if(event.key==='Enter')checkAuth()">
-        <button onclick="checkAuth()"
-                class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">
-            ログイン
-        </button>
-        <p id="auth-error" class="text-red-500 text-sm mt-3 hidden">パスワードが違います</p>
+<!-- 認証 -->
+<div id="auth-screen" class="fixed inset-0 flex items-center justify-center z-50" style="background:rgba(248,246,241,0.95);backdrop-filter:blur(40px)">
+    <div style="background:var(--surface);border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08)" class="rounded-2xl p-10 w-[360px] text-center">
+        <div class="text-3xl font-black tracking-tighter mb-1" style="color:var(--text)">BLITZ</div>
+        <p class="text-xs mb-8" style="color:var(--text3)">Team Dashboard</p>
+        <input id="password-input" type="password" placeholder="パスワード"
+               class="w-full px-4 py-3 rounded-lg text-sm outline-none mb-3 transition"
+               style="background:var(--surface2);border:1px solid var(--border);color:var(--text)"
+               onkeydown="if(event.key==='Enter')checkAuth()"
+               onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        <button onclick="checkAuth()" class="w-full py-3 rounded-lg text-sm font-semibold transition" style="background:var(--accent);color:#fff">ログイン</button>
+        <p id="auth-error" class="text-xs mt-3 hidden" style="color:#c0392b">パスワードが違います</p>
     </div>
 </div>
 
-<!-- メインダッシュボード -->
+<!-- サイドバー -->
 <div id="dashboard" class="hidden">
+<aside class="sidebar" style="background:var(--bg)">
+    <div class="px-4 py-5 border-b" style="border-color:var(--border)">
+        <div class="text-lg font-black tracking-tight">BLITZ</div>
+        <div class="text-[10px] mt-0.5" style="color:var(--text3)">AI Agent Team</div>
+    </div>
+    <nav class="p-3 space-y-0.5">
+        <div class="nav-item active" onclick="showView('overview')">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+            Overview
+        </div>
+        <div class="nav-item" onclick="showView('projects')">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v1H2zM2 7h12v1H2zM2 11h8v1H2z"/></svg>
+            Projects
+        </div>
+        <div class="nav-item" onclick="showView('members')">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+            Members
+        </div>
+        <div class="nav-item" onclick="showView('activity')">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 12l3-4 3 2 4-6 4 3"/></svg>
+            Activity
+        </div>
+    </nav>
+    <div class="p-3 mt-auto border-t" style="border-color:var(--border)">
+        <div id="sidebar-health" class="px-3 py-2 rounded-lg text-xs" style="background:var(--surface)">
+            <span id="sidebar-status-dot" class="dot inline-block mr-1.5" style="vertical-align:middle"></span>
+            <span id="sidebar-status-text" style="color:var(--text2)"></span>
+        </div>
+        <div id="sidebar-updated" class="text-[10px] mt-2 px-1" style="color:var(--text3)"></div>
+    </div>
+</aside>
 
-    <!-- ヘッダー -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="text-2xl">⚡</span>
-                <div>
-                    <h1 class="text-lg font-bold text-gray-900">BLITZ AI Agent Team</h1>
-                    <p class="text-xs text-gray-500">Progress Dashboard</p>
-                </div>
+<!-- メインコンテンツ -->
+<div class="main-content">
+<div class="max-w-5xl mx-auto px-8 py-8">
+
+    <!-- Overview -->
+    <div id="view-overview">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Overview</h1>
+                <p class="text-sm mt-1" style="color:var(--text3)">チーム全体の状況</p>
             </div>
-            <div class="flex items-center gap-4">
-                <span id="last-updated" class="text-xs text-gray-400"></span>
-                <button onclick="loadData()" class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition">
-                    🔄 更新
-                </button>
+            <button onclick="loadData()" class="text-xs px-3 py-1.5 rounded-md transition" style="background:var(--surface);border:1px solid var(--border);color:var(--text3)" onmouseover="this.style.borderColor='var(--border-light)'" onmouseout="this.style.borderColor='var(--border)'">↻ 更新</button>
+        </div>
+
+        <!-- アラート -->
+        <div id="alerts-container" class="space-y-2 mb-6"></div>
+
+        <!-- KPI -->
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <div class="stat-card fade-in fade-d1">
+                <div class="stat-label">全体進捗</div>
+                <div class="stat-value" id="total-progress"></div>
+                <div class="progress-thin mt-3"><div id="total-progress-bar" class="progress-fill" style="background:var(--accent);width:0%"></div></div>
+                <div class="text-xs mt-2" style="color:var(--text3)"><span id="total-done">0</span>/<span id="total-total">0</span> タスク完了</div>
+            </div>
+            <div class="stat-card fade-in fade-d2">
+                <div class="stat-label">アクティブ</div>
+                <div class="stat-value" id="active-members"></div>
+                <p id="active-members-detail" class="text-xs mt-2" style="color:var(--text3)"></p>
+            </div>
+            <div class="stat-card fade-in fade-d3">
+                <div class="stat-label">コミット (24h)</div>
+                <div class="stat-value" id="recent-commits"></div>
+            </div>
+            <div class="stat-card fade-in fade-d4">
+                <div class="stat-label">プロジェクト</div>
+                <div class="stat-value" id="project-count"></div>
+                <div class="text-xs mt-2" style="color:var(--text3)"><span id="tool-count">0</span> ツール</div>
             </div>
         </div>
-    </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
-
-        <!-- ① チーム全体ヘルス -->
-        <section class="fade-in">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div id="health-card" class="card bg-white rounded-xl shadow-sm border border-gray-200 p-5 col-span-1 md:col-span-1">
-                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">チーム状態</p>
-                    <div id="health-status" class="text-3xl font-bold"></div>
-                    <p id="health-label" class="text-sm mt-1"></p>
-                </div>
-                <div class="card bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">全体進捗</p>
-                    <div id="total-progress" class="text-3xl font-bold text-gray-900"></div>
-                    <div class="mt-2 bg-gray-200 rounded-full h-2">
-                        <div id="total-progress-bar" class="progress-bar bg-blue-600 h-2 rounded-full" style="width:0%"></div>
-                    </div>
-                </div>
-                <div class="card bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">アクティブメンバー</p>
-                    <div id="active-members" class="text-3xl font-bold text-gray-900"></div>
-                    <p id="active-members-detail" class="text-sm text-gray-500 mt-1"></p>
-                </div>
-                <div class="card bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">直近コミット</p>
-                    <div id="recent-commits" class="text-3xl font-bold text-gray-900"></div>
-                    <p class="text-sm text-gray-500 mt-1">過去24時間</p>
-                </div>
+        <!-- プロジェクト + トレンド -->
+        <div class="grid grid-cols-5 gap-6 mb-8">
+            <div class="col-span-3">
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text3)">Projects</h2>
+                <div id="overview-projects" class="space-y-3"></div>
             </div>
-        </section>
-
-        <!-- ② アラート -->
-        <section id="alerts-section" class="fade-in hidden">
-            <div id="alerts-container" class="space-y-2"></div>
-        </section>
-
-        <!-- ③ プロジェクト別進捗 -->
-        <section class="fade-in">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">プロジェクト別進捗</h2>
-            <div id="projects-container" class="space-y-3"></div>
-        </section>
-
-        <!-- ④ メンバー別アクティビティ -->
-        <section class="fade-in">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">メンバー別アクティビティ</h2>
-            <div id="members-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </section>
-
-        <!-- ⑤ 週次トレンド -->
-        <section class="fade-in">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">週次トレンド</h2>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                <canvas id="trend-chart" height="100"></canvas>
+            <div class="col-span-2">
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text3)">Trend</h2>
+                <div class="stat-card" style="padding:16px"><canvas id="trend-chart" height="200"></canvas></div>
             </div>
-        </section>
+        </div>
 
-        <!-- ⑥ 直近のコミット -->
-        <section class="fade-in">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">直近のコミット</h2>
-            <div id="commits-container" class="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100"></div>
-        </section>
+        <!-- メンバー + コミット -->
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text3)">Members</h2>
+                <div id="overview-members" class="stat-card" style="padding:4px 16px"></div>
+            </div>
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text3)">Recent Commits</h2>
+                <div id="overview-commits" class="stat-card" style="padding:0"></div>
+            </div>
+        </div>
+    </div>
 
-    </main>
+    <!-- Projects View -->
+    <div id="view-projects" class="hidden">
+        <h1 class="text-2xl font-bold tracking-tight mb-2">Projects</h1>
+        <p class="text-sm mb-8" style="color:var(--text3)">全プロジェクトのツール別進捗</p>
+        <div id="projects-full" class="space-y-6"></div>
+    </div>
 
-    <footer class="max-w-7xl mx-auto px-6 py-8 text-center text-xs text-gray-400">
-        BLITZ AI Agent Team Dashboard — 自動生成 by GitHub Actions
-    </footer>
+    <!-- Members View -->
+    <div id="view-members" class="hidden">
+        <h1 class="text-2xl font-bold tracking-tight mb-2">Members</h1>
+        <p class="text-sm mb-8" style="color:var(--text3)">メンバー別アクティビティ</p>
+        <div id="members-full" class="space-y-4"></div>
+    </div>
+
+    <!-- Activity View -->
+    <div id="view-activity" class="hidden">
+        <h1 class="text-2xl font-bold tracking-tight mb-2">Activity</h1>
+        <p class="text-sm mb-8" style="color:var(--text3)">直近のコミット履歴</p>
+        <div id="activity-full" class="stat-card" style="padding:0"></div>
+    </div>
+
+</div>
+</div>
 </div>
 
 <script>
-// === 認証 ===
-const PASS_HASH = '3d7cdd4da6a7fc866c7806fedb761c577010353dd6aa5b656d2fd381ba8aa140';
+const PASS_HASH='3d7cdd4da6a7fc866c7806fedb761c577010353dd6aa5b656d2fd381ba8aa140';
+async function sha256(m){const b=new TextEncoder().encode(m);const h=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function checkAuth(){if(sessionStorage.getItem('authed')==='true'){document.getElementById('auth-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');loadData();return}const hash=await sha256(document.getElementById('password-input').value);if(hash===PASS_HASH){sessionStorage.setItem('authed','true');document.getElementById('auth-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');loadData()}else{document.getElementById('auth-error').classList.remove('hidden')}}
+async function loadData(){try{const r=await fetch('data.json?t='+Date.now());window._data=await r.json();renderAll(window._data)}catch(e){}}
 
-async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+// ナビ
+let currentView='overview';
+function showView(v){
+    document.querySelectorAll('[id^="view-"]').forEach(el=>el.classList.add('hidden'));
+    document.getElementById('view-'+v).classList.remove('hidden');
+    document.querySelectorAll('.nav-item').forEach((el,i)=>{el.classList.toggle('active',['overview','projects','members','activity'][i]===v)});
+    currentView=v;
+    if(window._data)renderAll(window._data);
 }
 
-async function checkAuth() {
-    if (sessionStorage.getItem('authed') === 'true') {
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        loadData();
-        return;
-    }
-    const input = document.getElementById('password-input').value;
-    const hash = await sha256(input);
-    if (hash === PASS_HASH) {
-        sessionStorage.setItem('authed', 'true');
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        loadData();
-    } else {
-        document.getElementById('auth-error').classList.remove('hidden');
-    }
-}
+// カラー
+const COLORS=[{bg:'#7c6a4f',light:'rgba(124,106,79,0.1)',text:'#7c6a4f'},{bg:'#8b7355',light:'rgba(139,115,85,0.1)',text:'#8b7355'},{bg:'#5c8a6e',light:'rgba(92,138,110,0.1)',text:'#5c8a6e'},{bg:'#a0845c',light:'rgba(160,132,92,0.1)',text:'#a0845c'},{bg:'#8c7a94',light:'rgba(140,122,148,0.1)',text:'#8c7a94'}];
+const cmap={};let ci=0;
+function gc(l){if(!l)return COLORS[4];if(!cmap[l]){cmap[l]=COLORS[ci%COLORS.length];ci++}return cmap[l]}
+function sn(l){if(!l)return'?';const p=l.split('-');return p.length>=2?p[0]:l.length>10?l.substring(0,10):l}
 
-// === データ読み込み ===
-async function loadData() {
-    try {
-        const resp = await fetch('data.json?t=' + Date.now());
-        const data = await resp.json();
-        renderDashboard(data);
-    } catch (e) {
-        renderDashboard(getSampleData());
-    }
-}
+function renderAll(d){
+    // サイドバー
+    const hc={green:'#5c8a6e',yellow:'#c49a3c',red:'#c0392b'};
+    const hl={green:'順調',yellow:'注意',red:'要対応'};
+    document.getElementById('sidebar-status-dot').style.background=hc[d.team_health]||hc.yellow;
+    document.getElementById('sidebar-status-text').textContent='チーム: '+(hl[d.team_health]||'—');
+    document.getElementById('sidebar-updated').textContent='更新: '+new Date(d.generated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 
-function getSampleData() {
-    return {
-        generated_at: new Date().toISOString(),
-        team_health: "green",
-        total_progress: { done: 0, total: 14, percent: 0 },
-        active_members: { active: 1, total: 5 },
-        recent_commit_count: 2,
-        alerts: [
-            { type: "warning", message: "4名がまだ初回セットアップ未完了です" }
-        ],
-        projects: [
-            { name: "blitz-ad", tools: [
-                { name: "VPSログイン", file: "00_vps_login.md", done: 0, total: 0, status: "unknown" },
-                { name: "Meta広告エージェント", file: "00_meta_agent.md", done: 0, total: 0, status: "unknown" },
-                { name: "KPI分析モジュール", file: "00_kpi_analyzer.md", done: 0, total: 0, status: "unknown" },
-                { name: "動画検索モジュール", file: "00_video_finder.md", done: 0, total: 0, status: "unknown" },
-                { name: "Meta定期巡回", file: "01_meta_patrol.md", done: 0, total: 0, status: "unknown" },
-                { name: "予実シート自動化", file: "02_yojitsu_auto.md", done: 5, total: 15, status: "yellow" },
-                { name: "予実AI診断", file: "03_yojitsu_spec.md", done: 0, total: 0, status: "unknown" },
-                { name: "Meta広告設定変更", file: "04_requirements.md", done: 0, total: 0, status: "unknown" },
-                { name: "MTG議事録自動生成", file: "05_mtg_minutes.md", done: 0, total: 0, status: "unknown" },
-                { name: "LP複製・アップロード", file: "09_lp_deploy.md", done: 0, total: 9, status: "red" },
-                { name: "領収書取得・照合", file: "10_receipt_auto.md", done: 0, total: 0, status: "unknown" },
-                { name: "日次シート自動作成", file: "11_daily_report_auto.md", done: 0, total: 0, status: "unknown" }
-            ]}
-        ],
-        members: [
-            { login: "kawasumishuhei0117", display: "川澄", last_push: "2026-04-02", commits_today: 2, status: "active", working_on: "blitz-ad" },
-            { login: "kawasumi-shuhei-pixel", display: "kawasumi-shuhei-pixel", last_push: null, commits_today: 0, status: "inactive", working_on: "-" },
-            { login: "takahashi-saika-maker", display: "takahashi-saika-maker", last_push: null, commits_today: 0, status: "inactive", working_on: "-" },
-            { login: "uda-tatsuya-create", display: "uda-tatsuya-create", last_push: null, commits_today: 0, status: "inactive", working_on: "-" },
-            { login: "yamamoto-kosuke-ai", display: "yamamoto-kosuke-ai", last_push: null, commits_today: 0, status: "inactive", working_on: "-" }
-        ],
-        recent_commits: [
-            { author: "kawasumishuhei0117", repo: "blitz-ad", message: "02: E列書き込みをset_acctに修正 + 新規CPS見出しCENTER配置", date: "2026-04-02T15:42:30Z", files: 3, additions: 45, deletions: 23 },
-            { author: "kawasumishuhei0117", repo: "blitz-ad", message: "初回コミット", date: "2026-04-02T06:42:30Z", files: 300, additions: 44212, deletions: 109 }
-        ],
-        weekly_trend: {
-            labels: ["3/27", "3/28", "3/29", "3/30", "3/31", "4/1", "4/2"],
-            progress: [0, 0, 0, 0, 0, 0, 0],
-            commits: [0, 0, 0, 0, 0, 0, 3]
-        }
-    };
-}
+    // KPI
+    document.getElementById('total-progress').textContent=d.total_progress.percent+'%';
+    document.getElementById('total-progress-bar').style.width=d.total_progress.percent+'%';
+    document.getElementById('total-done').textContent=d.total_progress.done;
+    document.getElementById('total-total').textContent=d.total_progress.total;
+    document.getElementById('active-members').textContent=d.active_members.active+'/'+d.active_members.total;
+    document.getElementById('active-members-detail').textContent=d.active_members.active+'名 稼働中';
+    document.getElementById('recent-commits').textContent=d.recent_commit_count;
+    const totalTools=d.projects.reduce((s,p)=>s+p.tools.length,0);
+    document.getElementById('project-count').textContent=d.projects.length;
+    document.getElementById('tool-count').textContent=totalTools;
 
-// === メンバーカラー（担当者を色で区別）===
-const MEMBER_COLORS = [
-    { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
-    { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300' },
-    { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-300' },
-    { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-300' },
-    { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-pink-300' },
-];
-const memberColorMap = {};
-let colorIdx = 0;
-function getMemberColor(login) {
-    if (!login) return { bg: 'bg-gray-100', text: 'text-gray-500', border: 'border-gray-300' };
-    if (!memberColorMap[login]) {
-        memberColorMap[login] = MEMBER_COLORS[colorIdx % MEMBER_COLORS.length];
-        colorIdx++;
-    }
-    return memberColorMap[login];
-}
-function getMemberShortName(login) {
-    if (!login) return '未設定';
-    // 短縮名を生成（ハイフン区切りの場合は最初の部分）
-    const parts = login.split('-');
-    if (parts.length >= 2) return parts[0];
-    if (login.length > 10) return login.substring(0, 10);
-    return login;
-}
-
-// === 描画 ===
-function renderDashboard(data) {
-    document.getElementById('last-updated').textContent = '最終更新: ' + new Date(data.generated_at).toLocaleString('ja-JP');
-
-    // ① ヘルス
-    const healthMap = { green: { icon: '🟢', label: '順調', color: 'text-green-600' }, yellow: { icon: '🟡', label: '注意', color: 'text-yellow-600' }, red: { icon: '🔴', label: '要対応', color: 'text-red-600' } };
-    const h = healthMap[data.team_health] || healthMap.yellow;
-    document.getElementById('health-status').textContent = h.icon;
-    document.getElementById('health-label').className = `text-sm mt-1 font-medium ${h.color}`;
-    document.getElementById('health-label').textContent = h.label;
-
-    document.getElementById('total-progress').textContent = data.total_progress.percent + '%';
-    document.getElementById('total-progress-bar').style.width = data.total_progress.percent + '%';
-
-    document.getElementById('active-members').textContent = data.active_members.active + '/' + data.active_members.total;
-    document.getElementById('active-members-detail').textContent = `${data.active_members.active}名が直近2日以内にpush`;
-
-    document.getElementById('recent-commits').textContent = data.recent_commit_count;
-
-    // ② アラート
-    const alertsContainer = document.getElementById('alerts-container');
-    const alertsSection = document.getElementById('alerts-section');
-    alertsContainer.innerHTML = '';
-    if (data.alerts && data.alerts.length > 0) {
-        alertsSection.classList.remove('hidden');
-        data.alerts.forEach(a => {
-            const colorMap = { error: 'bg-red-50 border-red-200 text-red-800', warning: 'bg-yellow-50 border-yellow-200 text-yellow-800', info: 'bg-blue-50 border-blue-200 text-blue-800' };
-            const iconMap = { error: '🔴', warning: '⚠️', info: 'ℹ️' };
-            alertsContainer.innerHTML += `<div class="flex items-center gap-3 px-4 py-3 rounded-lg border ${colorMap[a.type] || colorMap.info}">
-                <span>${iconMap[a.type] || 'ℹ️'}</span><span class="text-sm font-medium">${a.message}</span></div>`;
-        });
-    } else {
-        alertsSection.classList.add('hidden');
-    }
-
-    // ③ プロジェクト別（クリック展開対応）
-    const projContainer = document.getElementById('projects-container');
-    projContainer.innerHTML = '';
-    let toolIdx = 0;
-    data.projects.forEach(proj => {
-        proj.tools.forEach(tool => {
-            const idx = toolIdx++;
-            const pct = tool.total > 0 ? Math.round(tool.done / tool.total * 100) : 0;
-            const statusMap = { green: { dot: 'bg-green-500', bar: 'bg-green-500', label: '順調' }, yellow: { dot: 'bg-yellow-500', bar: 'bg-yellow-500', label: '作業中' }, red: { dot: 'bg-red-500', bar: 'bg-red-500', label: '未着手' }, unknown: { dot: 'bg-gray-400', bar: 'bg-gray-400', label: '未設定' } };
-            const s = statusMap[tool.status] || statusMap.unknown;
-            const taskLabel = tool.total > 0 ? `${tool.done}/${tool.total}` : 'チェックリスト未追加';
-            const mc = getMemberColor(tool.assignee);
-            const assignee = tool.assignee ? `<span class="text-xs font-medium ${mc.bg} ${mc.text} px-2.5 py-1 rounded-full border ${mc.border}">👤 ${getMemberShortName(tool.assignee)}</span>` : '<span class="text-xs bg-gray-100 text-gray-400 px-2.5 py-1 rounded-full">担当未設定</span>';
-            const hasDetail = (tool.remaining_tasks && tool.remaining_tasks.length > 0) || (tool.completed_tasks && tool.completed_tasks.length > 0);
-            const chevron = hasDetail ? `<span class="chevron text-gray-400 text-xs" id="chevron-${idx}">▶</span>` : '';
-
-            let detailHtml = '';
-            if (hasDetail) {
-                let tasks = '';
-                if (tool.remaining_tasks && tool.remaining_tasks.length > 0) {
-                    tasks += `<p class="text-xs font-medium text-gray-500 mb-1">残りタスク (${tool.remaining_tasks.length}件)</p>`;
-                    tool.remaining_tasks.forEach(t => { tasks += `<div class="flex items-start gap-2 py-1"><span class="text-gray-400">☐</span><span class="text-sm text-gray-700">${t}</span></div>`; });
-                }
-                if (tool.completed_tasks && tool.completed_tasks.length > 0) {
-                    tasks += `<p class="text-xs font-medium text-gray-500 mt-3 mb-1">完了済み (${tool.completed_tasks.length}件)</p>`;
-                    tool.completed_tasks.forEach(t => { tasks += `<div class="flex items-start gap-2 py-1"><span class="text-green-500">✓</span><span class="text-sm text-gray-400 line-through">${t}</span></div>`; });
-                }
-                detailHtml = `<div class="task-detail" id="detail-${idx}"><div class="pt-3 mt-3 border-t border-gray-100 px-1">${tasks}</div></div>`;
-            }
-
-            projContainer.innerHTML += `
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="tool-row p-4 flex items-center gap-4" onclick="toggleDetail(${idx})">
-                        ${chevron}
-                        <div class="w-3 h-3 rounded-full ${s.dot} flex-shrink-0"></div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <span class="text-sm font-medium text-gray-900">${tool.name}</span>
-                                ${assignee}
-                                <span class="text-xs text-gray-400">${s.label}</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="flex-1 bg-gray-200 rounded-full h-2">
-                                    <div class="progress-bar ${s.bar} h-2 rounded-full" style="width:${pct}%"></div>
-                                </div>
-                                <span class="text-xs text-gray-500 flex-shrink-0">${taskLabel}</span>
-                            </div>
-                        </div>
-                        <span class="text-sm font-bold text-gray-700 w-12 text-right">${tool.total > 0 ? pct + '%' : '-'}</span>
-                    </div>
-                    ${detailHtml}
-                </div>`;
-        });
+    // アラート
+    const ac=document.getElementById('alerts-container');ac.innerHTML='';
+    (d.alerts||[]).forEach(a=>{
+        const c={error:{border:'#c0392b',bg:'#fdf0ee',text:'#8b2318'},warning:{border:'#c49a3c',bg:'#fdf8ee',text:'#6b5525'},info:{border:'#7c6a4f',bg:'#f5f2ed',text:'#5c4d38'}};
+        const s=c[a.type]||c.info;
+        ac.innerHTML+=`<div class="alert-bar" style="border-color:${s.border};background:${s.bg};color:${s.text}">${a.message}</div>`;
     });
 
-    // ④ メンバー別（担当ツール表示対応）
-    const membersContainer = document.getElementById('members-container');
-    membersContainer.innerHTML = '';
-    data.members.forEach(m => {
-        const isActive = m.status === 'active';
-        const borderColor = isActive ? 'border-green-200' : (m.status === 'warning' ? 'border-yellow-200' : 'border-gray-200');
-        const statusBadge = isActive
-            ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">稼働中</span>'
-            : (m.last_push ? '<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">⚠️ pushなし</span>' : '<span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full">未セットアップ</span>');
-        const lastPush = m.last_push ? m.last_push : '-';
-        const workingTool = m.working_tool && m.working_tool !== '-' ? m.working_tool : '';
-        const workingInfo = workingTool
-            ? `<div>作業中: <span class="font-medium text-gray-700">${workingTool}</span> <span class="text-gray-400">(${m.working_on})</span></div>`
-            : `<div>作業中: ${m.working_on}</div>`;
-        membersContainer.innerHTML += `
-            <div class="card bg-white rounded-xl shadow-sm border ${borderColor} p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="font-medium text-gray-900">👤 ${m.display}</span>
-                    ${statusBadge}
+    // Overview Projects（コンパクトカード）
+    const op=document.getElementById('overview-projects');op.innerHTML='';
+    d.projects.forEach(proj=>{
+        if(!proj.tools.length)return;
+        const done=proj.tools.reduce((s,t)=>s+t.done,0);
+        const total=proj.tools.reduce((s,t)=>s+t.total,0);
+        const pct=total>0?Math.round(done/total*100):0;
+        const assignees=[...new Set(proj.tools.map(t=>t.assignee).filter(Boolean))];
+        const avatars=assignees.slice(0,3).map(a=>{const c=gc(a);return`<div class="avatar" style="background:${c.light};color:${c.text};width:24px;height:24px;font-size:10px;margin-left:-6px;border:2px solid var(--surface)">${sn(a).charAt(0).toUpperCase()}</div>`}).join('');
+        op.innerHTML+=`
+        <div class="project-card" style="padding:16px 20px">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-semibold">${proj.name}</span>
+                    <span class="text-[11px]" style="color:var(--text3)">${proj.tools.length} tools</span>
                 </div>
-                <div class="text-xs text-gray-500 space-y-1">
-                    <div>最終push: ${lastPush}</div>
-                    <div>本日コミット: ${m.commits_today}件</div>
-                    ${workingInfo}
-                </div>
-            </div>`;
+                <div class="flex items-center">${avatars?'<div class="flex items-center ml-2" style="padding-left:6px">'+avatars+'</div>':''}</div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="flex-1 progress-thin"><div class="progress-fill" style="width:${pct}%;background:${pct>=80?'#5c8a6e':pct>0?'var(--accent)':'var(--border)'}"></div></div>
+                <span class="text-xs font-semibold" style="color:${pct>=80?'#5c8a6e':pct>0?'var(--text2)':'var(--text3)'}">${pct}%</span>
+                <span class="text-[11px]" style="color:var(--text3)">${done}/${total}</span>
+            </div>
+        </div>`;
     });
 
-    // ⑤ 週次トレンド
-    const ctx = document.getElementById('trend-chart').getContext('2d');
-    if (window.trendChart) window.trendChart.destroy();
-    window.trendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.weekly_trend.labels,
-            datasets: [
-                { label: '進捗率 (%)', data: data.weekly_trend.progress, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
-                { label: 'コミット数', data: data.weekly_trend.commits, borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
-            ]
-        },
-        options: {
-            responsive: true,
-            interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { position: 'top' } },
-            scales: {
-                y: { type: 'linear', display: true, position: 'left', title: { display: true, text: '進捗率 (%)' }, min: 0, max: 100 },
-                y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'コミット数' }, min: 0, grid: { drawOnChartArea: false } }
-            }
-        }
-    });
-
-    // ⑥ 直近コミット
-    const commitsContainer = document.getElementById('commits-container');
-    commitsContainer.innerHTML = '';
-    data.recent_commits.slice(0, 10).forEach(c => {
-        const date = new Date(c.date).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        commitsContainer.innerHTML += `
-            <div class="px-4 py-3 flex items-start gap-3">
-                <span class="text-xs text-gray-400 w-16 flex-shrink-0 pt-0.5">${date}</span>
+    // Full Projects View
+    const pf=document.getElementById('projects-full');pf.innerHTML='';let ti=0;
+    d.projects.forEach(proj=>{
+        if(!proj.tools.length)return;
+        let toolsHtml='';
+        proj.tools.forEach(tool=>{
+            const idx=ti++;
+            const pct=tool.total>0?Math.round(tool.done/tool.total*100):0;
+            const sc={green:'#5c8a6e',yellow:'#c49a3c',red:'#c0392b',unknown:'#d6d1c9'};
+            const sl={green:'完了',yellow:'進行中',red:'未着手',unknown:'—'};
+            const dotColor=sc[tool.status]||sc.unknown;
+            const c=gc(tool.assignee);
+            const badge=tool.assignee?`<span class="badge" style="background:${c.light};color:${c.text}">${sn(tool.assignee)}</span>`:'';
+            const hd=(tool.remaining_tasks&&tool.remaining_tasks.length>0)||(tool.completed_tasks&&tool.completed_tasks.length>0);
+            let det='';
+            if(hd){let ts='';
+                if(tool.remaining_tasks&&tool.remaining_tasks.length>0){tool.remaining_tasks.forEach(t=>{ts+=`<div class="flex items-center gap-2 py-1.5" style="border-bottom:1px solid rgba(255,255,255,0.03)"><span style="color:var(--text3);font-size:11px">○</span><span style="font-size:13px;color:var(--text2)">${t}</span></div>`})}
+                if(tool.completed_tasks&&tool.completed_tasks.length>0){tool.completed_tasks.forEach(t=>{ts+=`<div class="flex items-center gap-2 py-1.5"><span style="color:#5c8a6e;font-size:11px">✓</span><span style="font-size:13px;color:var(--text3);text-decoration:line-through">${t}</span></div>`})}
+                det=`<div class="task-detail" id="detail-${idx}" style="padding:0 16px"><div style="padding:8px 0;border-top:1px solid var(--border)">${ts}</div></div>`}
+            toolsHtml+=`
+            <div class="tool-item" onclick="toggleDetail(${idx})">
+                <div class="dot" style="background:${dotColor}"></div>
                 <div class="flex-1 min-w-0">
-                    <span class="text-sm font-medium text-gray-700">${c.author}</span>
-                    <span class="text-xs text-gray-400 mx-1">in</span>
-                    <span class="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">${c.repo}</span>
-                    <p class="text-sm text-gray-900 mt-0.5 truncate">${c.message}</p>
-                    <span class="text-xs text-gray-400">${c.files}ファイル (+${c.additions}/-${c.deletions})</span>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm">${tool.name}</span>${badge}
+                    </div>
                 </div>
-            </div>`;
+                <div class="flex items-center gap-3">
+                    <div class="progress-thin" style="width:80px"><div class="progress-fill" style="width:${pct}%;background:${dotColor}"></div></div>
+                    <span class="text-xs font-semibold" style="color:var(--text2);width:36px;text-align:right">${tool.total>0?pct+'%':'—'}</span>
+                    <span class="text-[11px]" style="color:var(--text3);width:40px;text-align:right">${tool.total>0?tool.done+'/'+tool.total:'—'}</span>
+                </div>
+            </div>${det}`;
+        });
+        const done=proj.tools.reduce((s,t)=>s+t.done,0);
+        const total=proj.tools.reduce((s,t)=>s+t.total,0);
+        pf.innerHTML+=`<div class="project-card"><div style="padding:14px 16px;border-bottom:1px solid var(--border)" class="flex items-center justify-between"><span class="text-sm font-semibold">${proj.name}</span><span class="text-xs" style="color:var(--text3)">${done}/${total} tasks</span></div>${toolsHtml}</div>`;
     });
+
+    // Members
+    const om=document.getElementById('overview-members');om.innerHTML='';
+    const mf=document.getElementById('members-full');mf.innerHTML='';
+    d.members.forEach(m=>{
+        const c=gc(m.login);
+        const isA=m.status==='active';
+        const badge=isA?`<span class="dot" style="background:#5c8a6e;width:6px;height:6px"></span><span class="text-[11px]" style="color:#5c8a6e">稼働中</span>`
+            :(m.last_push?`<span class="text-[11px]" style="color:#c49a3c">pushなし</span>`:`<span class="text-[11px]" style="color:var(--text3)">未セットアップ</span>`);
+        const wt=m.working_tool&&m.working_tool!=='-'?m.working_tool:(m.working_on!=='-'?m.working_on:'');
+        const row=`
+        <div class="member-row">
+            <div class="avatar" style="background:${c.light};color:${c.text}">${sn(m.login).charAt(0).toUpperCase()}</div>
+            <div class="flex-1">
+                <div class="flex items-center gap-2"><span class="text-sm font-medium">${sn(m.login)}</span>${badge}</div>
+                <div class="text-[11px] mt-0.5" style="color:var(--text3)">${wt} ${m.commits_today>0?'・'+m.commits_today+' commits':''}</div>
+            </div>
+            <div class="text-[11px] text-right" style="color:var(--text3)">${m.last_push||'—'}</div>
+        </div>`;
+        om.innerHTML+=row;
+        // Full view gets larger cards
+        mf.innerHTML+=`<div class="stat-card" style="padding:16px 20px"><div class="flex items-center gap-3"><div class="avatar" style="background:${c.light};color:${c.text};width:40px;height:40px;font-size:16px">${sn(m.login).charAt(0).toUpperCase()}</div><div class="flex-1"><div class="flex items-center gap-2"><span class="font-semibold">${m.login}</span>${badge}</div><div class="text-xs mt-1" style="color:var(--text3)">最終push: ${m.last_push||'—'} / 作業中: ${wt||'—'} / 本日: ${m.commits_today}件</div></div></div></div>`;
+    });
+
+    // Commits
+    const oc=document.getElementById('overview-commits');oc.innerHTML='';
+    const af=document.getElementById('activity-full');af.innerHTML='';
+    (d.recent_commits||[]).forEach((commit,i)=>{
+        const c=gc(commit.author);
+        const dt=new Date(commit.date).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+        const row=`<div class="commit-row"><div class="flex items-center gap-3"><div class="avatar" style="background:${c.light};color:${c.text};width:24px;height:24px;font-size:10px">${sn(commit.author).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><div class="text-sm truncate">${commit.message}</div><div class="text-[11px] mt-0.5" style="color:var(--text3)">${sn(commit.author)} · ${commit.repo} · ${dt} · ${commit.files}files +${commit.additions}/-${commit.deletions}</div></div></div></div>`;
+        if(i<5)oc.innerHTML+=row;
+        af.innerHTML+=row;
+    });
+
+    // Trend
+    const ctx=document.getElementById('trend-chart').getContext('2d');
+    if(window.tc)window.tc.destroy();
+    window.tc=new Chart(ctx,{type:'line',data:{labels:d.weekly_trend.labels,datasets:[
+        {label:'進捗率',data:d.weekly_trend.progress,borderColor:'#7c6a4f',backgroundColor:'rgba(124,106,79,0.06)',fill:true,tension:0.4,pointRadius:2,pointBackgroundColor:'#7c6a4f',borderWidth:1.5,yAxisID:'y'},
+        {label:'コミット',data:d.weekly_trend.commits,borderColor:'#5c8a6e',backgroundColor:'rgba(92,138,110,0.06)',fill:true,tension:0.4,pointRadius:2,pointBackgroundColor:'#5c8a6e',borderWidth:1.5,yAxisID:'y1'}
+    ]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#9c9590',font:{size:10,family:'Inter'},boxWidth:8,padding:12}}},scales:{
+        x:{ticks:{color:'#9c9590',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{position:'left',min:0,max:100,ticks:{color:'#9c9590',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+        y1:{position:'right',min:0,ticks:{color:'#9c9590',font:{size:10}},grid:{drawOnChartArea:false}}
+    }}});
 }
 
-// === ツール詳細の展開/折りたたみ ===
-function toggleDetail(idx) {
-    const detail = document.getElementById('detail-' + idx);
-    const chevron = document.getElementById('chevron-' + idx);
-    if (!detail) return;
-    detail.classList.toggle('open');
-    if (chevron) chevron.classList.toggle('open');
-}
-
-// 初期化
-window.addEventListener('DOMContentLoaded', () => {
-    if (sessionStorage.getItem('authed') === 'true') checkAuth();
-});
+function toggleDetail(i){const d=document.getElementById('detail-'+i);if(d)d.classList.toggle('open')}
+window.addEventListener('DOMContentLoaded',()=>{if(sessionStorage.getItem('authed')==='true')checkAuth()});
 </script>
-
 </body>
 </html>

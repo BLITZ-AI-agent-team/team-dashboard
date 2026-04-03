@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLITZ AI Agent Team - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; }
+        .progress-bar { transition: width 0.8s ease-in-out; }
+        #auth-screen { backdrop-filter: blur(8px); }
+        .card { transition: transform 0.15s; }
+        .card:hover { transform: translateY(-1px); }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .task-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .task-detail.open { max-height: 800px; transition: max-height 0.5s ease-in; }
+        .tool-row { cursor: pointer; }
+        .tool-row:hover { background-color: #f9fafb; }
+        .chevron { transition: transform 0.2s; }
+        .chevron.open { transform: rotate(90deg); }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rag: { green: '#22c55e', yellow: '#eab308', red: '#ef4444' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- パスワード認証画面 -->
+<div id="auth-screen" class="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-96 text-center">
+        <div class="text-4xl mb-4">🔒</div>
+        <h2 class="text-xl font-bold text-gray-800 mb-2">Team Dashboard</h2>
+        <p class="text-gray-500 text-sm mb-6">社内メンバー専用です</p>
+        <input id="password-input" type="password" placeholder="パスワードを入力"
+               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none mb-4"
+               onkeydown="if(event.key==='Enter')checkAuth()">
+        <button onclick="checkAuth()"
+                class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">
+            ログイン
+        </button>
+        <p id="auth-error" class="text-red-500 text-sm mt-3 hidden">パスワードが違います</p>
+    </div>
+</div>
+
+<!-- メインダッシュボード -->
+<div id="dashboard" class="hidden">
+
+    <!-- ヘッダー -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">⚡</span>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-900">BLITZ AI Agent Team</h1>
+                    <p class="text-xs text-gray-500">Progress Dashboard</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="last-updated" class="text-xs text-gray-400"></span>
+                <button onclick="loadData()" class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition">
+                    🔄 更新
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+
+        <!-- ① チーム全体ヘルス -->
+        <section class="fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div id="health-card" class="card bg-white rounded-xl shadow-sm border border-gray-200 p-5 col-span-1 md:col-span-1">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">チーム状態</p>
+                    <div id="health-status" class="text-3xl font-bold"></div>
+                    <p id="health-label" class="text-sm mt-1"></p>
+                </div>
+                <div class="card bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">全体進捗</p>
+                    <div id="total-progress" class="text-3xl font-bold text-gray-900"></div>
+                    <div class="mt-2 bg-gray-200 rounded-full h-2">
+                        <div id="total-progress-bar" class="progress-bar bg-blue-600 h-2 rounded-full" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="card bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">アクティブメンバー</p>
+                    <div id="active-members" class="text-3xl font-bold text-gray-900"></div>
+                    <p id="active-members-detail" class="text-sm text-gray-500 mt-1"></p>
+                </div>
+                <div class="card bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">直近コミット</p>
+                    <div id="recent-commits" class="text-3xl font-bold text-gray-900"></div>
+                    <p class="text-sm text-gray-500 mt-1">過去24時間</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ② アラート -->
+        <section id="alerts-section" class="fade-in hidden">
+            <div id="alerts-container" class="space-y-2"></div>
+        </section>
+
+        <!-- ③ プロジェクト別進捗 -->
+        <section class="fade-in">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">プロジェクト別進捗</h2>
+            <div id="projects-container" class="space-y-3"></div>
+        </section>
+
+        <!-- ④ メンバー別アクティビティ -->
+        <section class="fade-in">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">メンバー別アクティビティ</h2>
+            <div id="members-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </section>
+
+        <!-- ⑤ 週次トレンド -->
+        <section class="fade-in">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">週次トレンド</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <canvas id="trend-chart" height="100"></canvas>
+            </div>
+        </section>
+
+        <!-- ⑥ 直近のコミット -->
+        <section class="fade-in">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">直近のコミット</h2>
+            <div id="commits-container" class="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100"></div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto px-6 py-8 text-center text-xs text-gray-400">
+        BLITZ AI Agent Team Dashboard — 自動生成 by GitHub Actions
+    </footer>
+</div>
+
+<script>
+// === 認証 ===
+const PASS_HASH = '3d7cdd4da6a7fc866c7806fedb761c577010353dd6aa5b656d2fd381ba8aa140';
+
+async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkAuth() {
+    if (sessionStorage.getItem('authed') === 'true') {
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        loadData();
+        return;
+    }
+    const input = document.getElementById('password-input').value;
+    const hash = await sha256(input);
+    if (hash === PASS_HASH) {
+        sessionStorage.setItem('authed', 'true');
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        loadData();
+    } else {
+        document.getElementById('auth-error').classList.remove('hidden');
+    }
+}
+
+// === データ読み込み ===
+async function loadData() {
+    try {
+        const resp = await fetch('data.json?t=' + Date.now());
+        const data = await resp.json();
+        renderDashboard(data);
+    } catch (e) {
+        renderDashboard(getSampleData());
+    }
+}
+
+function getSampleData() {
+    return {
+        generated_at: new Date().toISOString(),
+        team_health: "green",
+        total_progress: { done: 0, total: 14, percent: 0 },
+        active_members: { active: 1, total: 5 },
+        recent_commit_count: 2,
+        alerts: [
+            { type: "warning", message: "4名がまだ初回セットアップ未完了です" }
+        ],
+        projects: [
+            { name: "blitz-ad", tools: [
+                { name: "VPSログイン", file: "00_vps_login.md", done: 0, total: 0, status: "unknown" },
+                { name: "Meta広告エージェント", file: "00_meta_agent.md", done: 0, total: 0, status: "unknown" },
+                { name: "KPI分析モジュール", file: "00_kpi_analyzer.md", done: 0, total: 0, status: "unknown" },
+                { name: "動画検索モジュール", file: "00_video_finder.md", done: 0, total: 0, status: "unknown" },
+                { name: "Meta定期巡回", file: "01_meta_patrol.md", done: 0, total: 0, status: "unknown" },
+                { name: "予実シート自動化", file: "02_yojitsu_auto.md", done: 5, total: 15, status: "yellow" },
+                { name: "予実AI診断", file: "03_yojitsu_spec.md", done: 0, total: 0, status: "unknown" },
+                { name: "Meta広告設定変更", file: "04_requirements.md", done: 0, total: 0, status: "unknown" },
+                { name: "MTG議事録自動生成", file: "05_mtg_minutes.md", done: 0, total: 0, status: "unknown" },
+                { name: "LP複製・アップロード", file: "09_lp_deploy.md", done: 0, total: 9, status: "red" },
+                { name: "領収書取得・照合", file: "10_receipt_auto.md", done: 0, total: 0, status: "unknown" },
+                { name: "日次シート自動作成", file: "11_daily_report_auto.md", done: 0, total: 0, status: "unknown" }
+            ]}
+        ],
+        members: [
+            { login: "kawasumishuhei0117", display: "川澄", last_push: "2026-04-02", commits_today: 2, status: "active", working_on: "blitz-ad" },
+            { login: "kawasumi-shuhei-pixel", display: "kawasumi-shuhei-pixel", last_push: null, commits_today: 0, status: "inactive", working_on: "-" },
+            { login: "takahashi-saika-maker", display: "takahashi-saika-maker", last_push: null, commits_today: 0, status: "inactive", working_on: "-" },
+            { login: "uda-tatsuya-create", display: "uda-tatsuya-create", last_push: null, commits_today: 0, status: "inactive", working_on: "-" },
+            { login: "yamamoto-kosuke-ai", display: "yamamoto-kosuke-ai", last_push: null, commits_today: 0, status: "inactive", working_on: "-" }
+        ],
+        recent_commits: [
+            { author: "kawasumishuhei0117", repo: "blitz-ad", message: "02: E列書き込みをset_acctに修正 + 新規CPS見出しCENTER配置", date: "2026-04-02T15:42:30Z", files: 3, additions: 45, deletions: 23 },
+            { author: "kawasumishuhei0117", repo: "blitz-ad", message: "初回コミット", date: "2026-04-02T06:42:30Z", files: 300, additions: 44212, deletions: 109 }
+        ],
+        weekly_trend: {
+            labels: ["3/27", "3/28", "3/29", "3/30", "3/31", "4/1", "4/2"],
+            progress: [0, 0, 0, 0, 0, 0, 0],
+            commits: [0, 0, 0, 0, 0, 0, 3]
+        }
+    };
+}
+
+// === メンバーカラー（担当者を色で区別）===
+const MEMBER_COLORS = [
+    { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
+    { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300' },
+    { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-300' },
+    { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-300' },
+    { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-pink-300' },
+];
+const memberColorMap = {};
+let colorIdx = 0;
+function getMemberColor(login) {
+    if (!login) return { bg: 'bg-gray-100', text: 'text-gray-500', border: 'border-gray-300' };
+    if (!memberColorMap[login]) {
+        memberColorMap[login] = MEMBER_COLORS[colorIdx % MEMBER_COLORS.length];
+        colorIdx++;
+    }
+    return memberColorMap[login];
+}
+function getMemberShortName(login) {
+    if (!login) return '未設定';
+    // 短縮名を生成（ハイフン区切りの場合は最初の部分）
+    const parts = login.split('-');
+    if (parts.length >= 2) return parts[0];
+    if (login.length > 10) return login.substring(0, 10);
+    return login;
+}
+
+// === 描画 ===
+function renderDashboard(data) {
+    document.getElementById('last-updated').textContent = '最終更新: ' + new Date(data.generated_at).toLocaleString('ja-JP');
+
+    // ① ヘルス
+    const healthMap = { green: { icon: '🟢', label: '順調', color: 'text-green-600' }, yellow: { icon: '🟡', label: '注意', color: 'text-yellow-600' }, red: { icon: '🔴', label: '要対応', color: 'text-red-600' } };
+    const h = healthMap[data.team_health] || healthMap.yellow;
+    document.getElementById('health-status').textContent = h.icon;
+    document.getElementById('health-label').className = `text-sm mt-1 font-medium ${h.color}`;
+    document.getElementById('health-label').textContent = h.label;
+
+    document.getElementById('total-progress').textContent = data.total_progress.percent + '%';
+    document.getElementById('total-progress-bar').style.width = data.total_progress.percent + '%';
+
+    document.getElementById('active-members').textContent = data.active_members.active + '/' + data.active_members.total;
+    document.getElementById('active-members-detail').textContent = `${data.active_members.active}名が直近2日以内にpush`;
+
+    document.getElementById('recent-commits').textContent = data.recent_commit_count;
+
+    // ② アラート
+    const alertsContainer = document.getElementById('alerts-container');
+    const alertsSection = document.getElementById('alerts-section');
+    alertsContainer.innerHTML = '';
+    if (data.alerts && data.alerts.length > 0) {
+        alertsSection.classList.remove('hidden');
+        data.alerts.forEach(a => {
+            const colorMap = { error: 'bg-red-50 border-red-200 text-red-800', warning: 'bg-yellow-50 border-yellow-200 text-yellow-800', info: 'bg-blue-50 border-blue-200 text-blue-800' };
+            const iconMap = { error: '🔴', warning: '⚠️', info: 'ℹ️' };
+            alertsContainer.innerHTML += `<div class="flex items-center gap-3 px-4 py-3 rounded-lg border ${colorMap[a.type] || colorMap.info}">
+                <span>${iconMap[a.type] || 'ℹ️'}</span><span class="text-sm font-medium">${a.message}</span></div>`;
+        });
+    } else {
+        alertsSection.classList.add('hidden');
+    }
+
+    // ③ プロジェクト別（クリック展開対応）
+    const projContainer = document.getElementById('projects-container');
+    projContainer.innerHTML = '';
+    let toolIdx = 0;
+    data.projects.forEach(proj => {
+        proj.tools.forEach(tool => {
+            const idx = toolIdx++;
+            const pct = tool.total > 0 ? Math.round(tool.done / tool.total * 100) : 0;
+            const statusMap = { green: { dot: 'bg-green-500', bar: 'bg-green-500', label: '順調' }, yellow: { dot: 'bg-yellow-500', bar: 'bg-yellow-500', label: '作業中' }, red: { dot: 'bg-red-500', bar: 'bg-red-500', label: '未着手' }, unknown: { dot: 'bg-gray-400', bar: 'bg-gray-400', label: '未設定' } };
+            const s = statusMap[tool.status] || statusMap.unknown;
+            const taskLabel = tool.total > 0 ? `${tool.done}/${tool.total}` : 'チェックリスト未追加';
+            const mc = getMemberColor(tool.assignee);
+            const assignee = tool.assignee ? `<span class="text-xs font-medium ${mc.bg} ${mc.text} px-2.5 py-1 rounded-full border ${mc.border}">👤 ${getMemberShortName(tool.assignee)}</span>` : '<span class="text-xs bg-gray-100 text-gray-400 px-2.5 py-1 rounded-full">担当未設定</span>';
+            const hasDetail = (tool.remaining_tasks && tool.remaining_tasks.length > 0) || (tool.completed_tasks && tool.completed_tasks.length > 0);
+            const chevron = hasDetail ? `<span class="chevron text-gray-400 text-xs" id="chevron-${idx}">▶</span>` : '';
+
+            let detailHtml = '';
+            if (hasDetail) {
+                let tasks = '';
+                if (tool.remaining_tasks && tool.remaining_tasks.length > 0) {
+                    tasks += `<p class="text-xs font-medium text-gray-500 mb-1">残りタスク (${tool.remaining_tasks.length}件)</p>`;
+                    tool.remaining_tasks.forEach(t => { tasks += `<div class="flex items-start gap-2 py-1"><span class="text-gray-400">☐</span><span class="text-sm text-gray-700">${t}</span></div>`; });
+                }
+                if (tool.completed_tasks && tool.completed_tasks.length > 0) {
+                    tasks += `<p class="text-xs font-medium text-gray-500 mt-3 mb-1">完了済み (${tool.completed_tasks.length}件)</p>`;
+                    tool.completed_tasks.forEach(t => { tasks += `<div class="flex items-start gap-2 py-1"><span class="text-green-500">✓</span><span class="text-sm text-gray-400 line-through">${t}</span></div>`; });
+                }
+                detailHtml = `<div class="task-detail" id="detail-${idx}"><div class="pt-3 mt-3 border-t border-gray-100 px-1">${tasks}</div></div>`;
+            }
+
+            projContainer.innerHTML += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="tool-row p-4 flex items-center gap-4" onclick="toggleDetail(${idx})">
+                        ${chevron}
+                        <div class="w-3 h-3 rounded-full ${s.dot} flex-shrink-0"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="text-sm font-medium text-gray-900">${tool.name}</span>
+                                ${assignee}
+                                <span class="text-xs text-gray-400">${s.label}</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                    <div class="progress-bar ${s.bar} h-2 rounded-full" style="width:${pct}%"></div>
+                                </div>
+                                <span class="text-xs text-gray-500 flex-shrink-0">${taskLabel}</span>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-gray-700 w-12 text-right">${tool.total > 0 ? pct + '%' : '-'}</span>
+                    </div>
+                    ${detailHtml}
+                </div>`;
+        });
+    });
+
+    // ④ メンバー別（担当ツール表示対応）
+    const membersContainer = document.getElementById('members-container');
+    membersContainer.innerHTML = '';
+    data.members.forEach(m => {
+        const isActive = m.status === 'active';
+        const borderColor = isActive ? 'border-green-200' : (m.status === 'warning' ? 'border-yellow-200' : 'border-gray-200');
+        const statusBadge = isActive
+            ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">稼働中</span>'
+            : (m.last_push ? '<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">⚠️ pushなし</span>' : '<span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full">未セットアップ</span>');
+        const lastPush = m.last_push ? m.last_push : '-';
+        const workingTool = m.working_tool && m.working_tool !== '-' ? m.working_tool : '';
+        const workingInfo = workingTool
+            ? `<div>作業中: <span class="font-medium text-gray-700">${workingTool}</span> <span class="text-gray-400">(${m.working_on})</span></div>`
+            : `<div>作業中: ${m.working_on}</div>`;
+        membersContainer.innerHTML += `
+            <div class="card bg-white rounded-xl shadow-sm border ${borderColor} p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-medium text-gray-900">👤 ${m.display}</span>
+                    ${statusBadge}
+                </div>
+                <div class="text-xs text-gray-500 space-y-1">
+                    <div>最終push: ${lastPush}</div>
+                    <div>本日コミット: ${m.commits_today}件</div>
+                    ${workingInfo}
+                </div>
+            </div>`;
+    });
+
+    // ⑤ 週次トレンド
+    const ctx = document.getElementById('trend-chart').getContext('2d');
+    if (window.trendChart) window.trendChart.destroy();
+    window.trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.weekly_trend.labels,
+            datasets: [
+                { label: '進捗率 (%)', data: data.weekly_trend.progress, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
+                { label: 'コミット数', data: data.weekly_trend.commits, borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'top' } },
+            scales: {
+                y: { type: 'linear', display: true, position: 'left', title: { display: true, text: '進捗率 (%)' }, min: 0, max: 100 },
+                y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'コミット数' }, min: 0, grid: { drawOnChartArea: false } }
+            }
+        }
+    });
+
+    // ⑥ 直近コミット
+    const commitsContainer = document.getElementById('commits-container');
+    commitsContainer.innerHTML = '';
+    data.recent_commits.slice(0, 10).forEach(c => {
+        const date = new Date(c.date).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        commitsContainer.innerHTML += `
+            <div class="px-4 py-3 flex items-start gap-3">
+                <span class="text-xs text-gray-400 w-16 flex-shrink-0 pt-0.5">${date}</span>
+                <div class="flex-1 min-w-0">
+                    <span class="text-sm font-medium text-gray-700">${c.author}</span>
+                    <span class="text-xs text-gray-400 mx-1">in</span>
+                    <span class="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">${c.repo}</span>
+                    <p class="text-sm text-gray-900 mt-0.5 truncate">${c.message}</p>
+                    <span class="text-xs text-gray-400">${c.files}ファイル (+${c.additions}/-${c.deletions})</span>
+                </div>
+            </div>`;
+    });
+}
+
+// === ツール詳細の展開/折りたたみ ===
+function toggleDetail(idx) {
+    const detail = document.getElementById('detail-' + idx);
+    const chevron = document.getElementById('chevron-' + idx);
+    if (!detail) return;
+    detail.classList.toggle('open');
+    if (chevron) chevron.classList.toggle('open');
+}
+
+// 初期化
+window.addEventListener('DOMContentLoaded', () => {
+    if (sessionStorage.getItem('authed') === 'true') checkAuth();
+});
+</script>
+
+</body>
+</html>
