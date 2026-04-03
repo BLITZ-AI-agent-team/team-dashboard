@@ -95,17 +95,26 @@ for repo in repos:
     all_commits = recent_commits_raw + yesterday_commits
     total_commits += len(all_commits)
 
-    # 担当者マッピング: ファイル番号プレフィクス → 最新コミットの著者
+    # 担当者マッピング
+    # 方式1: コミットメッセージの先頭番号（02: xxx）からツール別に特定
     tool_assignees = {}
     for c in all_commits:
         msg = c.get("message", "")
         author = c.get("author", "unknown")
-        # "02: xxx" パターンからツール番号を抽出
         m = re.match(r'^(\d{2})[:：\s]', msg)
         if m:
             prefix = m.group(1)
             if prefix not in tool_assignees:
                 tool_assignees[prefix] = author
+
+    # 方式2: リポジトリ全体で最もコミットしている人 = リポジトリ担当者
+    repo_contributors = gh_json(f'api repos/{full}/contributors --jq "[.[] | {{login: .login, contributions: .contributions}}]"')
+    if isinstance(repo_contributors, str):
+        repo_contributors = json.loads(repo_contributors) if repo_contributors else []
+    repo_top_contributor = None
+    if repo_contributors and isinstance(repo_contributors, list) and len(repo_contributors) > 0:
+        repo_contributors.sort(key=lambda x: x.get("contributions", 0), reverse=True)
+        repo_top_contributor = repo_contributors[0].get("login")
 
     # コミット詳細を収集
     for c in all_commits[:10]:  # 直近10件
@@ -216,11 +225,13 @@ for repo in repos:
         total_done += t["done"]
         total_tasks += t["total"]
 
-        # ファイル番号プレフィクスから担当者を取得（再取得）
+        # 担当者の決定（優先順位: コミットメッセージ番号 > リポジトリ最多コミッター）
         file_prefix = re.match(r'^(\d{2})_', t["file"])
         assignee = t["assignee"]
         if not assignee and file_prefix:
             assignee = tool_assignees.get(file_prefix.group(1))
+        if not assignee:
+            assignee = repo_top_contributor
 
         # 表示名にバージョンとモジュール情報を含める
         display_name = t["clean_name"]
