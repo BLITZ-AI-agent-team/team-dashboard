@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         *{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-        :root{--bg:#09090b;--surface:#18181b;--surface2:#27272a;--border:#27272a;--border-light:#3f3f46;--text:#fafafa;--text2:#a1a1aa;--text3:#71717a;--accent:#3b82f6}
+        :root{--bg:#f8f6f1;--surface:#ffffff;--surface2:#f3f0eb;--border:#e8e4dd;--border-light:#d6d1c9;--text:#1a1a1a;--text2:#6b6560;--text3:#9c9590;--accent:#7c6a4f}
         body{background:var(--bg);color:var(--text)}
         .sidebar{width:240px;border-right:1px solid var(--border);height:100vh;position:fixed;top:0;left:0;overflow-y:auto}
         .main-content{margin-left:240px}
@@ -22,17 +22,17 @@
         .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
         .project-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
         .project-card:hover{border-color:var(--border-light)}
-        .tool-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background .15s}
-        .tool-item:hover{background:rgba(255,255,255,0.02)}
+        .tool-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;transition:background .15s}
+        .tool-item:hover{background:rgba(0,0,0,0.02)}
         .tool-item:last-child{border-bottom:none}
         .progress-thin{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
         .progress-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
         .badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px}
-        .member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+        .member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.04)}
         .member-row:last-child{border-bottom:none}
         .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
-        .commit-row{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .15s}
-        .commit-row:hover{background:rgba(255,255,255,0.02)}
+        .commit-row{padding:12px 16px;border-bottom:1px solid rgba(0,0,0,0.04);transition:background .15s}
+        .commit-row:hover{background:rgba(0,0,0,0.02)}
         .commit-row:last-child{border-bottom:none}
         .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
         .task-detail{max-height:0;overflow:hidden;transition:max-height .3s cubic-bezier(.4,0,.2,1)}
@@ -42,22 +42,25 @@
         .fade-in{animation:fadeIn .4s ease both}
         .fade-d1{animation-delay:.05s}.fade-d2{animation-delay:.1s}.fade-d3{animation-delay:.15s}.fade-d4{animation-delay:.2s}
         ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+        .stat-card{box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+        .project-card{box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+        .nav-item:hover,.nav-item.active{background:var(--surface2)}
     </style>
 </head>
 <body>
 
 <!-- 認証 -->
-<div id="auth-screen" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50" style="backdrop-filter:blur(40px)">
-    <div style="background:var(--surface);border:1px solid var(--border)" class="rounded-2xl p-10 w-[360px] text-center">
-        <div class="text-3xl font-black tracking-tighter mb-1">BLITZ</div>
+<div id="auth-screen" class="fixed inset-0 flex items-center justify-center z-50" style="background:rgba(248,246,241,0.95);backdrop-filter:blur(40px)">
+    <div style="background:var(--surface);border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08)" class="rounded-2xl p-10 w-[360px] text-center">
+        <div class="text-3xl font-black tracking-tighter mb-1" style="color:var(--text)">BLITZ</div>
         <p class="text-xs mb-8" style="color:var(--text3)">Team Dashboard</p>
         <input id="password-input" type="password" placeholder="パスワード"
                class="w-full px-4 py-3 rounded-lg text-sm outline-none mb-3 transition"
-               style="background:var(--bg);border:1px solid var(--border);color:var(--text)"
+               style="background:var(--surface2);border:1px solid var(--border);color:var(--text)"
                onkeydown="if(event.key==='Enter')checkAuth()"
                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
         <button onclick="checkAuth()" class="w-full py-3 rounded-lg text-sm font-semibold transition" style="background:var(--accent);color:#fff">ログイン</button>
-        <p id="auth-error" class="text-red-400 text-xs mt-3 hidden">パスワードが違います</p>
+        <p id="auth-error" class="text-xs mt-3 hidden" style="color:#c0392b">パスワードが違います</p>
     </div>
 </div>
 
@@ -203,14 +206,14 @@ function showView(v){
 }
 
 // カラー
-const COLORS=[{bg:'#3b82f6',light:'rgba(59,130,246,0.12)',text:'#93c5fd'},{bg:'#8b5cf6',light:'rgba(139,92,246,0.12)',text:'#c4b5fd'},{bg:'#10b981',light:'rgba(16,185,129,0.12)',text:'#6ee7b7'},{bg:'#f59e0b',light:'rgba(245,158,11,0.12)',text:'#fcd34d'},{bg:'#ec4899',light:'rgba(236,72,153,0.12)',text:'#f9a8d4'}];
+const COLORS=[{bg:'#7c6a4f',light:'rgba(124,106,79,0.1)',text:'#7c6a4f'},{bg:'#8b7355',light:'rgba(139,115,85,0.1)',text:'#8b7355'},{bg:'#5c8a6e',light:'rgba(92,138,110,0.1)',text:'#5c8a6e'},{bg:'#a0845c',light:'rgba(160,132,92,0.1)',text:'#a0845c'},{bg:'#8c7a94',light:'rgba(140,122,148,0.1)',text:'#8c7a94'}];
 const cmap={};let ci=0;
 function gc(l){if(!l)return COLORS[4];if(!cmap[l]){cmap[l]=COLORS[ci%COLORS.length];ci++}return cmap[l]}
 function sn(l){if(!l)return'?';const p=l.split('-');return p.length>=2?p[0]:l.length>10?l.substring(0,10):l}
 
 function renderAll(d){
     // サイドバー
-    const hc={green:'#22c55e',yellow:'#eab308',red:'#ef4444'};
+    const hc={green:'#5c8a6e',yellow:'#c49a3c',red:'#c0392b'};
     const hl={green:'順調',yellow:'注意',red:'要対応'};
     document.getElementById('sidebar-status-dot').style.background=hc[d.team_health]||hc.yellow;
     document.getElementById('sidebar-status-text').textContent='チーム: '+(hl[d.team_health]||'—');
@@ -231,7 +234,7 @@ function renderAll(d){
     // アラート
     const ac=document.getElementById('alerts-container');ac.innerHTML='';
     (d.alerts||[]).forEach(a=>{
-        const c={error:{border:'#ef4444',bg:'rgba(239,68,68,0.06)',text:'#fca5a5'},warning:{border:'#eab308',bg:'rgba(234,179,8,0.06)',text:'#fde68a'},info:{border:'#3b82f6',bg:'rgba(59,130,246,0.06)',text:'#93c5fd'}};
+        const c={error:{border:'#c0392b',bg:'rgba(192,57,43,0.06)',text:'#c0392b'},warning:{border:'#c49a3c',bg:'rgba(196,154,60,0.06)',text:'#8b7355'},info:{border:'#7c6a4f',bg:'rgba(124,106,79,0.06)',text:'#7c6a4f'}};
         const s=c[a.type]||c.info;
         ac.innerHTML+=`<div class="alert-bar" style="border-color:${s.border};background:${s.bg};color:${s.text}">${a.message}</div>`;
     });
@@ -255,8 +258,8 @@ function renderAll(d){
                 <div class="flex items-center">${avatars?'<div class="flex items-center ml-2" style="padding-left:6px">'+avatars+'</div>':''}</div>
             </div>
             <div class="flex items-center gap-3">
-                <div class="flex-1 progress-thin"><div class="progress-fill" style="width:${pct}%;background:${pct>=80?'#22c55e':pct>0?'var(--accent)':'var(--border)'}"></div></div>
-                <span class="text-xs font-semibold" style="color:${pct>=80?'#22c55e':pct>0?'var(--text2)':'var(--text3)'}">${pct}%</span>
+                <div class="flex-1 progress-thin"><div class="progress-fill" style="width:${pct}%;background:${pct>=80?'#5c8a6e':pct>0?'var(--accent)':'var(--border)'}"></div></div>
+                <span class="text-xs font-semibold" style="color:${pct>=80?'#5c8a6e':pct>0?'var(--text2)':'var(--text3)'}">${pct}%</span>
                 <span class="text-[11px]" style="color:var(--text3)">${done}/${total}</span>
             </div>
         </div>`;
@@ -270,7 +273,7 @@ function renderAll(d){
         proj.tools.forEach(tool=>{
             const idx=ti++;
             const pct=tool.total>0?Math.round(tool.done/tool.total*100):0;
-            const sc={green:'#22c55e',yellow:'#eab308',red:'#ef4444',unknown:'#3f3f46'};
+            const sc={green:'#5c8a6e',yellow:'#c49a3c',red:'#c0392b',unknown:'#d6d1c9'};
             const sl={green:'完了',yellow:'進行中',red:'未着手',unknown:'—'};
             const dotColor=sc[tool.status]||sc.unknown;
             const c=gc(tool.assignee);
@@ -279,7 +282,7 @@ function renderAll(d){
             let det='';
             if(hd){let ts='';
                 if(tool.remaining_tasks&&tool.remaining_tasks.length>0){tool.remaining_tasks.forEach(t=>{ts+=`<div class="flex items-center gap-2 py-1.5" style="border-bottom:1px solid rgba(255,255,255,0.03)"><span style="color:var(--text3);font-size:11px">○</span><span style="font-size:13px;color:var(--text2)">${t}</span></div>`})}
-                if(tool.completed_tasks&&tool.completed_tasks.length>0){tool.completed_tasks.forEach(t=>{ts+=`<div class="flex items-center gap-2 py-1.5"><span style="color:#22c55e;font-size:11px">✓</span><span style="font-size:13px;color:var(--text3);text-decoration:line-through">${t}</span></div>`})}
+                if(tool.completed_tasks&&tool.completed_tasks.length>0){tool.completed_tasks.forEach(t=>{ts+=`<div class="flex items-center gap-2 py-1.5"><span style="color:#5c8a6e;font-size:11px">✓</span><span style="font-size:13px;color:var(--text3);text-decoration:line-through">${t}</span></div>`})}
                 det=`<div class="task-detail" id="detail-${idx}" style="padding:0 16px"><div style="padding:8px 0;border-top:1px solid var(--border)">${ts}</div></div>`}
             toolsHtml+=`
             <div class="tool-item" onclick="toggleDetail(${idx})">
@@ -307,8 +310,8 @@ function renderAll(d){
     d.members.forEach(m=>{
         const c=gc(m.login);
         const isA=m.status==='active';
-        const badge=isA?`<span class="dot" style="background:#22c55e;width:6px;height:6px"></span><span class="text-[11px]" style="color:#22c55e">稼働中</span>`
-            :(m.last_push?`<span class="text-[11px]" style="color:#eab308">pushなし</span>`:`<span class="text-[11px]" style="color:var(--text3)">未セットアップ</span>`);
+        const badge=isA?`<span class="dot" style="background:#5c8a6e;width:6px;height:6px"></span><span class="text-[11px]" style="color:#5c8a6e">稼働中</span>`
+            :(m.last_push?`<span class="text-[11px]" style="color:#c49a3c">pushなし</span>`:`<span class="text-[11px]" style="color:var(--text3)">未セットアップ</span>`);
         const wt=m.working_tool&&m.working_tool!=='-'?m.working_tool:(m.working_on!=='-'?m.working_on:'');
         const row=`
         <div class="member-row">
@@ -339,12 +342,12 @@ function renderAll(d){
     const ctx=document.getElementById('trend-chart').getContext('2d');
     if(window.tc)window.tc.destroy();
     window.tc=new Chart(ctx,{type:'line',data:{labels:d.weekly_trend.labels,datasets:[
-        {label:'進捗率',data:d.weekly_trend.progress,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.05)',fill:true,tension:0.4,pointRadius:2,pointBackgroundColor:'#3b82f6',borderWidth:1.5,yAxisID:'y'},
-        {label:'コミット',data:d.weekly_trend.commits,borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.05)',fill:true,tension:0.4,pointRadius:2,pointBackgroundColor:'#8b5cf6',borderWidth:1.5,yAxisID:'y1'}
-    ]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#71717a',font:{size:10,family:'Inter'},boxWidth:8,padding:12}}},scales:{
-        x:{ticks:{color:'#52525b',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
-        y:{position:'left',min:0,max:100,ticks:{color:'#52525b',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
-        y1:{position:'right',min:0,ticks:{color:'#52525b',font:{size:10}},grid:{drawOnChartArea:false}}
+        {label:'進捗率',data:d.weekly_trend.progress,borderColor:'#7c6a4f',backgroundColor:'rgba(124,106,79,0.06)',fill:true,tension:0.4,pointRadius:2,pointBackgroundColor:'#7c6a4f',borderWidth:1.5,yAxisID:'y'},
+        {label:'コミット',data:d.weekly_trend.commits,borderColor:'#5c8a6e',backgroundColor:'rgba(92,138,110,0.06)',fill:true,tension:0.4,pointRadius:2,pointBackgroundColor:'#5c8a6e',borderWidth:1.5,yAxisID:'y1'}
+    ]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#9c9590',font:{size:10,family:'Inter'},boxWidth:8,padding:12}}},scales:{
+        x:{ticks:{color:'#9c9590',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{position:'left',min:0,max:100,ticks:{color:'#9c9590',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+        y1:{position:'right',min:0,ticks:{color:'#9c9590',font:{size:10}},grid:{drawOnChartArea:false}}
     }}});
 }
 
