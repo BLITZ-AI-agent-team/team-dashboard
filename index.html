@@ -228,6 +228,33 @@ function getSampleData() {
     };
 }
 
+// === メンバーカラー（担当者を色で区別）===
+const MEMBER_COLORS = [
+    { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
+    { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300' },
+    { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-300' },
+    { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-300' },
+    { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-pink-300' },
+];
+const memberColorMap = {};
+let colorIdx = 0;
+function getMemberColor(login) {
+    if (!login) return { bg: 'bg-gray-100', text: 'text-gray-500', border: 'border-gray-300' };
+    if (!memberColorMap[login]) {
+        memberColorMap[login] = MEMBER_COLORS[colorIdx % MEMBER_COLORS.length];
+        colorIdx++;
+    }
+    return memberColorMap[login];
+}
+function getMemberShortName(login) {
+    if (!login) return '未設定';
+    // 短縮名を生成（ハイフン区切りの場合は最初の部分）
+    const parts = login.split('-');
+    if (parts.length >= 2) return parts[0];
+    if (login.length > 10) return login.substring(0, 10);
+    return login;
+}
+
 // === 描画 ===
 function renderDashboard(data) {
     document.getElementById('last-updated').textContent = '最終更新: ' + new Date(data.generated_at).toLocaleString('ja-JP');
@@ -274,7 +301,8 @@ function renderDashboard(data) {
             const statusMap = { green: { dot: 'bg-green-500', bar: 'bg-green-500', label: '順調' }, yellow: { dot: 'bg-yellow-500', bar: 'bg-yellow-500', label: '作業中' }, red: { dot: 'bg-red-500', bar: 'bg-red-500', label: '未着手' }, unknown: { dot: 'bg-gray-400', bar: 'bg-gray-400', label: '未設定' } };
             const s = statusMap[tool.status] || statusMap.unknown;
             const taskLabel = tool.total > 0 ? `${tool.done}/${tool.total}` : 'チェックリスト未追加';
-            const assignee = tool.assignee ? `<span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">👤 ${tool.assignee}</span>` : '';
+            const mc = getMemberColor(tool.assignee);
+            const assignee = tool.assignee ? `<span class="text-xs font-medium ${mc.bg} ${mc.text} px-2.5 py-1 rounded-full border ${mc.border}">👤 ${getMemberShortName(tool.assignee)}</span>` : '<span class="text-xs bg-gray-100 text-gray-400 px-2.5 py-1 rounded-full">担当未設定</span>';
             const hasDetail = (tool.remaining_tasks && tool.remaining_tasks.length > 0) || (tool.completed_tasks && tool.completed_tasks.length > 0);
             const chevron = hasDetail ? `<span class="chevron text-gray-400 text-xs" id="chevron-${idx}">▶</span>` : '';
 
