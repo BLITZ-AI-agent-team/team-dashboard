@@ -157,6 +157,7 @@ async function checkAuth() {
     if (sessionStorage.getItem('authed') === 'true') {
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
+        loadData();
         return;
     }
     const input = document.getElementById('password-input').value;
