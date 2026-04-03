@@ -125,7 +125,8 @@ for repo in repos:
             "deletions": detail.get("deletions", 0) if isinstance(detail, dict) else 0
         })
 
-    # 各要件定義書を解析
+    # 各要件定義書を解析 → まず全件読み込み、後で重複排除
+    raw_tools = []
     for f in md_files:
         content_b64 = gh(f'api repos/{full}/contents/{f} --jq .content')
         if not content_b64:
@@ -145,8 +146,6 @@ for repo in repos:
         checked = [l.strip().lstrip('- [x] ') for l in content.split('\n') if re.match(r'^\s*- \[x\]', l)]
         tool_total = len(unchecked) + len(checked)
         tool_done = len(checked)
-        total_done += tool_done
-        total_tasks += tool_total
 
         # ステータス
         if tool_total == 0:
@@ -161,24 +160,84 @@ for repo in repos:
         # ツール名
         clean_name = re.sub(r'\s*(要件定義書|仕様書).*$', '', title)
 
+        # バージョン番号を抽出（v2.0, v2.1, v3.0 等）
+        ver_match = re.search(r'v(\d+)\.(\d+)', title) or re.search(r'v(\d+)', title)
+        if ver_match:
+            ver_tuple = tuple(int(x) for x in ver_match.groups())
+        else:
+            ver_tuple = (0,)
+
+        # システム名を抽出（バージョン番号を除いた部分）
+        system_name = re.sub(r'\s*v\d+[\.\d]*\s*[-:]?\s*', ' ', clean_name).strip()
+        system_name = re.sub(r'\s+', ' ', system_name)
+
+        # モジュール名を検出（"- 売上照合", "- 顧客管理" 等のサブタイトル）
+        module_match = re.search(r'[-–—]\s*(.+)$', clean_name)
+        module_name = module_match.group(1).strip() if module_match else None
+
         # ファイル番号プレフィクスから担当者を取得
         file_prefix = re.match(r'^(\d{2})_', f)
         assignee = None
         if file_prefix:
             assignee = tool_assignees.get(file_prefix.group(1))
 
-        # 残タスク詳細
-        remaining_tasks = unchecked[:20]  # 最大20件
+        raw_tools.append({
+            "file": f, "title": title, "clean_name": clean_name,
+            "system_name": system_name, "module_name": module_name,
+            "version": ver_tuple, "ver_str": ver_match.group(0) if ver_match else "",
+            "done": tool_done, "total": tool_total, "status": status,
+            "assignee": assignee, "unchecked": unchecked, "checked": checked
+        })
+
+    # --- バージョン重複排除 ---
+    # 同じシステム名で、モジュール名がないもの同士 → 最新バージョンだけ残す
+    # モジュール名があるもの → 独立したツールとして残す
+    filtered_tools = []
+    # システム名ごとにグルーピング
+    system_groups = {}
+    for t in raw_tools:
+        if t["module_name"]:
+            # モジュールは独立して残す
+            filtered_tools.append(t)
+        else:
+            key = t["system_name"]
+            if key not in system_groups:
+                system_groups[key] = []
+            system_groups[key].append(t)
+
+    # 各システムの最新バージョンだけを残す
+    for key, versions in system_groups.items():
+        versions.sort(key=lambda x: x["version"], reverse=True)
+        latest = versions[0]
+        filtered_tools.append(latest)
+
+    # フィルタ後のツールでデータを構築
+    for t in filtered_tools:
+        total_done += t["done"]
+        total_tasks += t["total"]
+
+        # ファイル番号プレフィクスから担当者を取得（再取得）
+        file_prefix = re.match(r'^(\d{2})_', t["file"])
+        assignee = t["assignee"]
+        if not assignee and file_prefix:
+            assignee = tool_assignees.get(file_prefix.group(1))
+
+        # 表示名にバージョンとモジュール情報を含める
+        display_name = t["clean_name"]
+        if t["module_name"] and t["ver_str"]:
+            display_name = f'{t["module_name"]} ({t["ver_str"]})'
+        elif t["ver_str"]:
+            display_name = f'{t["system_name"]} ({t["ver_str"]})'
 
         tools.append({
-            "name": clean_name,
-            "file": f,
-            "done": tool_done,
-            "total": tool_total,
-            "status": status,
+            "name": display_name,
+            "file": t["file"],
+            "done": t["done"],
+            "total": t["total"],
+            "status": t["status"],
             "assignee": assignee,
-            "remaining_tasks": remaining_tasks,
-            "completed_tasks": checked[:10]
+            "remaining_tasks": t["unchecked"][:20],
+            "completed_tasks": t["checked"][:10]
         })
 
     projects.append({"name": repo, "tools": tools})
