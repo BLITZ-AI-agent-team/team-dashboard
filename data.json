@@ -1,0 +1,16 @@
+{
+    "generated_at": "2026-04-03T02:20:13Z",
+    "team_health": "red",
+    "total_progress": { "done": 5, "total": 24, "percent": 20 },
+    "active_members": { "active": 0, "total": 4 },
+    "recent_commit_count": 3,
+    "alerts": [{"type":"warning","message":"4名が直近2日間pushしていません"}],
+    "projects": [{"name":"blitz-ad","tools":[{"name":"広告KPI共通分析モジュール","file":"00_kpi_analyzer.md","done":0,"total":0,"status":"unknown"},{"name":"Meta広告操作エージェントモジュール","file":"00_meta_agent.md","done":0,"total":0,"status":"unknown"},{"name":"動画検索・分析モジュール","file":"00_video_finder.md","done":0,"total":0,"status":"unknown"},{"name":"VPSログイン＆アカウントログインモジュール","file":"00_vps_login.md","done":0,"total":0,"status":"unknown"},{"name":"Meta定期巡回モジュール","file":"01_meta_patrol.md","done":0,"total":0,"status":"unknown"},{"name":"予実シート自動化","file":"02_yojitsu_auto.md","done":5,"total":15,"status":"yellow"},{"name":"広告運用 予実AI診断・方針決定システム","file":"03_yojitsu_spec.md","done":0,"total":0,"status":"unknown"},{"name":"Meta広告設定変更ツール","file":"04_requirements.md","done":0,"total":0,"status":"unknown"},{"name":"MTG議事録自動生成ツール","file":"05_mtg_minutes.md","done":0,"total":0,"status":"unknown"},{"name":"LP複製・アップロード","file":"09_lp_deploy.md","done":0,"total":9,"status":"red"},{"name":"Meta広告 領収書取得・照合自動化モジュール","file":"10_receipt_auto.md","done":0,"total":0,"status":"unknown"},{"name":"業務指示書 日次シート自動作成","file":"11_daily_report_auto.md","done":0,"total":0,"status":"unknown"}]}],
+    "members": [{"login":"kawasumi-shuhei-pixel","display":"kawasumi-shuhei-pixel","last_push":null,"commits_today":0,"status":"inactive","working_on":"-"},{"login":"takahashi-saika-maker","display":"takahashi-saika-maker","last_push":null,"commits_today":0,"status":"inactive","working_on":"-"},{"login":"uda-tatsuya-create","display":"uda-tatsuya-create","last_push":null,"commits_today":0,"status":"inactive","working_on":"-"},{"login":"yamamoto-kosuke-ai","display":"yamamoto-kosuke-ai","last_push":null,"commits_today":0,"status":"inactive","working_on":"-"}],
+    "recent_commits": [{"author":"kawasumishuhei0117","repo":"blitz-ad","message":"02: E列書き込みをset_acctに修正 + 新規CPS見出しCENTER配置 + 不要ファイル・テストドメイン削除","date":"2026-04-02T09:40:44Z","files":300,"additions":4,"deletions":17752},{"author":"kawasumishuhei0117","repo":"blitz-ad","message":"初回コミット","date":"2026-04-02T06:36:07Z","files":300,"additions":44212,"deletions":109},{"author":"kawasumishuhei0117","repo":"blitz-ad","message":"02: Phase 2先頭でB列マージ解除 + s_set依存B列書き込み","date":"2026-04-02T00:26:24Z","files":1,"additions":12,"deletions":9}],
+    "weekly_trend": {
+        "labels": ["6d前","5d前","4d前","3d前","2d前","昨日","今日"],
+        "progress": [20,20,20,20,20,20,20],
+        "commits": [0,0,0,0,0,0,3]
+    }
+}
