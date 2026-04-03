@@ -3,305 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLITZ AI Agent Team - Dashboard v2</title>
+    <title>BLITZ — Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', system-ui, sans-serif; }
-        body { background: #0b0f1a; }
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); }
-        .glass-light { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
-        .glass-hover:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); }
-        .glow-blue { box-shadow: 0 0 20px rgba(59,130,246,0.15); }
-        .glow-green { box-shadow: 0 0 20px rgba(34,197,94,0.15); }
-        .glow-yellow { box-shadow: 0 0 20px rgba(234,179,8,0.12); }
-        .glow-red { box-shadow: 0 0 20px rgba(239,68,68,0.15); }
-        .progress-bar { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        .stat-number { background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .fade-up-1 { animation-delay: 0.05s; }
-        .fade-up-2 { animation-delay: 0.1s; }
-        .fade-up-3 { animation-delay: 0.15s; }
-        .fade-up-4 { animation-delay: 0.2s; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-        .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
-        .task-detail { max-height:0; overflow:hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s; opacity:0; }
-        .task-detail.open { max-height:800px; opacity:1; }
-        .tool-row { cursor:pointer; transition: background 0.2s; }
-        .tool-row:hover { background: rgba(255,255,255,0.04); }
-        .chevron { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
-        .chevron.open { transform: rotate(90deg); }
-        .gradient-border { position:relative; }
-        .gradient-border::before { content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(139,92,246,0.3),rgba(236,72,153,0.2)); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
-        .section-title { letter-spacing: 0.12em; }
-        ::-webkit-scrollbar { width:6px; }
-        ::-webkit-scrollbar-track { background:transparent; }
-        ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+        *{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+        :root{--bg:#09090b;--surface:#18181b;--surface2:#27272a;--border:#27272a;--border-light:#3f3f46;--text:#fafafa;--text2:#a1a1aa;--text3:#71717a;--accent:#3b82f6}
+        body{background:var(--bg);color:var(--text)}
+        .sidebar{width:240px;border-right:1px solid var(--border);height:100vh;position:fixed;top:0;left:0;overflow-y:auto}
+        .main-content{margin-left:240px}
+        .nav-item{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:6px;font-size:13px;color:var(--text3);cursor:pointer;transition:all .15s}
+        .nav-item:hover,.nav-item.active{background:var(--surface);color:var(--text)}
+        .nav-item.active{color:var(--text);font-weight:500}
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px}
+        .stat-card:hover{border-color:var(--border-light)}
+        .stat-value{font-size:32px;font-weight:800;letter-spacing:-0.02em;line-height:1}
+        .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+        .project-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+        .project-card:hover{border-color:var(--border-light)}
+        .tool-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background .15s}
+        .tool-item:hover{background:rgba(255,255,255,0.02)}
+        .tool-item:last-child{border-bottom:none}
+        .progress-thin{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+        .progress-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+        .badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px}
+        .member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+        .member-row:last-child{border-bottom:none}
+        .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+        .commit-row{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .15s}
+        .commit-row:hover{background:rgba(255,255,255,0.02)}
+        .commit-row:last-child{border-bottom:none}
+        .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+        .task-detail{max-height:0;overflow:hidden;transition:max-height .3s cubic-bezier(.4,0,.2,1)}
+        .task-detail.open{max-height:600px}
+        .alert-bar{border-left:3px solid;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;display:flex;align-items:center;gap:8px}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeIn .4s ease both}
+        .fade-d1{animation-delay:.05s}.fade-d2{animation-delay:.1s}.fade-d3{animation-delay:.15s}.fade-d4{animation-delay:.2s}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     </style>
-    <script>
-        tailwind.config = { theme: { extend: { colors: {
-            surface: { 1:'#0b0f1a', 2:'#111827', 3:'#1a2235', 4:'#243049' },
-            accent: { blue:'#3b82f6', purple:'#8b5cf6', pink:'#ec4899', cyan:'#06b6d4' }
-        }}}}
-    </script>
 </head>
-<body class="min-h-screen text-white">
+<body>
 
-<!-- 背景グラデーション -->
-<div class="fixed inset-0 pointer-events-none">
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl"></div>
-</div>
-
-<!-- パスワード認証 -->
-<div id="auth-screen" class="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50">
-    <div class="glass rounded-2xl p-8 w-96 text-center gradient-border">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl">⚡</div>
-        <h2 class="text-xl font-bold text-white mb-1">Team Dashboard</h2>
-        <p class="text-gray-500 text-sm mb-6">社内メンバー専用</p>
+<!-- 認証 -->
+<div id="auth-screen" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50" style="backdrop-filter:blur(40px)">
+    <div style="background:var(--surface);border:1px solid var(--border)" class="rounded-2xl p-10 w-[360px] text-center">
+        <div class="text-3xl font-black tracking-tighter mb-1">BLITZ</div>
+        <p class="text-xs mb-8" style="color:var(--text3)">Team Dashboard</p>
         <input id="password-input" type="password" placeholder="パスワード"
-               class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none mb-4 transition"
-               onkeydown="if(event.key==='Enter')checkAuth()">
-        <button onclick="checkAuth()"
-                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-500 hover:to-purple-500 transition-all shadow-lg shadow-blue-600/20">
-            ログイン
-        </button>
-        <p id="auth-error" class="text-red-400 text-sm mt-3 hidden">パスワードが違います</p>
+               class="w-full px-4 py-3 rounded-lg text-sm outline-none mb-3 transition"
+               style="background:var(--bg);border:1px solid var(--border);color:var(--text)"
+               onkeydown="if(event.key==='Enter')checkAuth()"
+               onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        <button onclick="checkAuth()" class="w-full py-3 rounded-lg text-sm font-semibold transition" style="background:var(--accent);color:#fff">ログイン</button>
+        <p id="auth-error" class="text-red-400 text-xs mt-3 hidden">パスワードが違います</p>
     </div>
 </div>
 
-<!-- メインダッシュボード -->
-<div id="dashboard" class="hidden relative">
+<!-- サイドバー -->
+<div id="dashboard" class="hidden">
+<aside class="sidebar" style="background:var(--bg)">
+    <div class="px-4 py-5 border-b" style="border-color:var(--border)">
+        <div class="text-lg font-black tracking-tight">BLITZ</div>
+        <div class="text-[10px] mt-0.5" style="color:var(--text3)">AI Agent Team</div>
+    </div>
+    <nav class="p-3 space-y-0.5">
+        <div class="nav-item active" onclick="showView('overview')">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+            Overview
+        </div>
+        <div class="nav-item" onclick="showView('projects')">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v1H2zM2 7h12v1H2zM2 11h8v1H2z"/></svg>
+            Projects
+        </div>
+        <div class="nav-item" onclick="showView('members')">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+            Members
+        </div>
+        <div class="nav-item" onclick="showView('activity')">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 12l3-4 3 2 4-6 4 3"/></svg>
+            Activity
+        </div>
+    </nav>
+    <div class="p-3 mt-auto border-t" style="border-color:var(--border)">
+        <div id="sidebar-health" class="px-3 py-2 rounded-lg text-xs" style="background:var(--surface)">
+            <span id="sidebar-status-dot" class="dot inline-block mr-1.5" style="vertical-align:middle"></span>
+            <span id="sidebar-status-text" style="color:var(--text2)"></span>
+        </div>
+        <div id="sidebar-updated" class="text-[10px] mt-2 px-1" style="color:var(--text3)"></div>
+    </div>
+</aside>
 
-    <!-- ヘッダー -->
-    <header class="sticky top-0 z-40 glass border-b border-white/5">
-        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg font-bold">⚡</div>
-                <div>
-                    <h1 class="text-base font-bold text-white tracking-tight">BLITZ AI Agent Team</h1>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Progress Dashboard</p>
-                </div>
+<!-- メインコンテンツ -->
+<div class="main-content">
+<div class="max-w-5xl mx-auto px-8 py-8">
+
+    <!-- Overview -->
+    <div id="view-overview">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Overview</h1>
+                <p class="text-sm mt-1" style="color:var(--text3)">チーム全体の状況</p>
             </div>
-            <div class="flex items-center gap-4">
-                <span id="last-updated" class="text-[11px] text-gray-600"></span>
-                <button onclick="loadData()" class="text-xs glass-light hover:bg-white/10 px-3 py-1.5 rounded-lg transition text-gray-400 hover:text-white">
-                    ↻ 更新
-                </button>
+            <button onclick="loadData()" class="text-xs px-3 py-1.5 rounded-md transition" style="background:var(--surface);border:1px solid var(--border);color:var(--text3)" onmouseover="this.style.borderColor='var(--border-light)'" onmouseout="this.style.borderColor='var(--border)'">↻ 更新</button>
+        </div>
+
+        <!-- アラート -->
+        <div id="alerts-container" class="space-y-2 mb-6"></div>
+
+        <!-- KPI -->
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <div class="stat-card fade-in fade-d1">
+                <div class="stat-label">全体進捗</div>
+                <div class="stat-value" id="total-progress"></div>
+                <div class="progress-thin mt-3"><div id="total-progress-bar" class="progress-fill" style="background:var(--accent);width:0%"></div></div>
+                <div class="text-xs mt-2" style="color:var(--text3)"><span id="total-done">0</span>/<span id="total-total">0</span> タスク完了</div>
+            </div>
+            <div class="stat-card fade-in fade-d2">
+                <div class="stat-label">アクティブ</div>
+                <div class="stat-value" id="active-members"></div>
+                <p id="active-members-detail" class="text-xs mt-2" style="color:var(--text3)"></p>
+            </div>
+            <div class="stat-card fade-in fade-d3">
+                <div class="stat-label">コミット (24h)</div>
+                <div class="stat-value" id="recent-commits"></div>
+            </div>
+            <div class="stat-card fade-in fade-d4">
+                <div class="stat-label">プロジェクト</div>
+                <div class="stat-value" id="project-count"></div>
+                <div class="text-xs mt-2" style="color:var(--text3)"><span id="tool-count">0</span> ツール</div>
             </div>
         </div>
-    </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
-
-        <!-- ① KPIカード -->
-        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div id="health-card" class="fade-up fade-up-1 glass rounded-2xl p-5 glow-blue">
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-3">チーム状態</p>
-                <div id="health-status" class="text-4xl mb-1"></div>
-                <p id="health-label" class="text-sm font-medium"></p>
+        <!-- プロジェクト + トレンド -->
+        <div class="grid grid-cols-5 gap-6 mb-8">
+            <div class="col-span-3">
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text3)">Projects</h2>
+                <div id="overview-projects" class="space-y-3"></div>
             </div>
-            <div class="fade-up fade-up-2 glass rounded-2xl p-5">
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-3">全体進捗</p>
-                <div id="total-progress" class="text-4xl font-bold stat-number mb-2"></div>
-                <div class="bg-white/5 rounded-full h-1.5 overflow-hidden">
-                    <div id="total-progress-bar" class="progress-bar bg-gradient-to-r from-blue-500 to-cyan-400 h-1.5 rounded-full" style="width:0%"></div>
-                </div>
+            <div class="col-span-2">
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text3)">Trend</h2>
+                <div class="stat-card" style="padding:16px"><canvas id="trend-chart" height="200"></canvas></div>
             </div>
-            <div class="fade-up fade-up-3 glass rounded-2xl p-5">
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-3">アクティブ</p>
-                <div id="active-members" class="text-4xl font-bold stat-number"></div>
-                <p id="active-members-detail" class="text-xs text-gray-500 mt-1"></p>
+        </div>
+
+        <!-- メンバー + コミット -->
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text3)">Members</h2>
+                <div id="overview-members" class="stat-card" style="padding:4px 16px"></div>
             </div>
-            <div class="fade-up fade-up-4 glass rounded-2xl p-5">
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-3">コミット</p>
-                <div id="recent-commits" class="text-4xl font-bold stat-number"></div>
-                <p class="text-xs text-gray-500 mt-1">過去24時間</p>
+            <div>
+                <h2 class="text-xs font-semibold uppercase tracking-wider mb-4" style="color:var(--text3)">Recent Commits</h2>
+                <div id="overview-commits" class="stat-card" style="padding:0"></div>
             </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- ② アラート -->
-        <section id="alerts-section" class="hidden">
-            <div id="alerts-container" class="space-y-2"></div>
-        </section>
+    <!-- Projects View -->
+    <div id="view-projects" class="hidden">
+        <h1 class="text-2xl font-bold tracking-tight mb-2">Projects</h1>
+        <p class="text-sm mb-8" style="color:var(--text3)">全プロジェクトのツール別進捗</p>
+        <div id="projects-full" class="space-y-6"></div>
+    </div>
 
-        <!-- ③ プロジェクト別進捗 -->
-        <section class="fade-up">
-            <h2 class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-4">プロジェクト別進捗</h2>
-            <div id="projects-container" class="space-y-2"></div>
-        </section>
+    <!-- Members View -->
+    <div id="view-members" class="hidden">
+        <h1 class="text-2xl font-bold tracking-tight mb-2">Members</h1>
+        <p class="text-sm mb-8" style="color:var(--text3)">メンバー別アクティビティ</p>
+        <div id="members-full" class="space-y-4"></div>
+    </div>
 
-        <!-- ④ メンバー別 + ⑤ トレンド（2カラム）-->
-        <section class="grid grid-cols-1 lg:grid-cols-5 gap-6 fade-up">
-            <div class="lg:col-span-2">
-                <h2 class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-4">メンバー</h2>
-                <div id="members-container" class="space-y-2"></div>
-            </div>
-            <div class="lg:col-span-3">
-                <h2 class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-4">週次トレンド</h2>
-                <div class="glass rounded-2xl p-5">
-                    <canvas id="trend-chart" height="140"></canvas>
-                </div>
-            </div>
-        </section>
+    <!-- Activity View -->
+    <div id="view-activity" class="hidden">
+        <h1 class="text-2xl font-bold tracking-tight mb-2">Activity</h1>
+        <p class="text-sm mb-8" style="color:var(--text3)">直近のコミット履歴</p>
+        <div id="activity-full" class="stat-card" style="padding:0"></div>
+    </div>
 
-        <!-- ⑥ 直近コミット -->
-        <section class="fade-up">
-            <h2 class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-4">直近のコミット</h2>
-            <div id="commits-container" class="glass rounded-2xl divide-y divide-white/5 overflow-hidden"></div>
-        </section>
-    </main>
-
-    <footer class="max-w-7xl mx-auto px-6 py-10 text-center text-[11px] text-gray-700">
-        BLITZ AI Agent Team &middot; Auto-generated Dashboard
-    </footer>
+</div>
+</div>
 </div>
 
 <script>
-const PASS_HASH = '3d7cdd4da6a7fc866c7806fedb761c577010353dd6aa5b656d2fd381ba8aa140';
+const PASS_HASH='3d7cdd4da6a7fc866c7806fedb761c577010353dd6aa5b656d2fd381ba8aa140';
 async function sha256(m){const b=new TextEncoder().encode(m);const h=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('')}
-async function checkAuth(){
-    if(sessionStorage.getItem('authed')==='true'){document.getElementById('auth-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');loadData();return}
-    const hash=await sha256(document.getElementById('password-input').value);
-    if(hash===PASS_HASH){sessionStorage.setItem('authed','true');document.getElementById('auth-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');loadData()}
-    else{document.getElementById('auth-error').classList.remove('hidden')}
+async function checkAuth(){if(sessionStorage.getItem('authed')==='true'){document.getElementById('auth-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');loadData();return}const hash=await sha256(document.getElementById('password-input').value);if(hash===PASS_HASH){sessionStorage.setItem('authed','true');document.getElementById('auth-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');loadData()}else{document.getElementById('auth-error').classList.remove('hidden')}}
+async function loadData(){try{const r=await fetch('data.json?t='+Date.now());window._data=await r.json();renderAll(window._data)}catch(e){}}
+
+// ナビ
+let currentView='overview';
+function showView(v){
+    document.querySelectorAll('[id^="view-"]').forEach(el=>el.classList.add('hidden'));
+    document.getElementById('view-'+v).classList.remove('hidden');
+    document.querySelectorAll('.nav-item').forEach((el,i)=>{el.classList.toggle('active',['overview','projects','members','activity'][i]===v)});
+    currentView=v;
+    if(window._data)renderAll(window._data);
 }
-async function loadData(){try{const r=await fetch('data.json?t='+Date.now());renderDashboard(await r.json())}catch(e){renderDashboard(getSampleData())}}
-function getSampleData(){return{generated_at:new Date().toISOString(),team_health:"yellow",total_progress:{done:30,total:150,percent:20},active_members:{active:2,total:5},recent_commit_count:5,alerts:[{type:"warning",message:"3名が直近2日間pushしていません"}],projects:[{name:"blitz-ad",tools:[{name:"予実シート自動化 (v4)",done:7,total:23,status:"yellow",assignee:"kawasumishuhei0117",remaining_tasks:["Gemini分析","シート書き込み"],completed_tasks:["Firebase認証","API連携"]}]}],members:[{login:"kawasumishuhei0117",display:"kawasumishuhei0117",last_push:"2026-04-03",commits_today:3,status:"active",working_on:"blitz-ad",working_tool:"予実シート自動化"}],recent_commits:[{author:"kawasumishuhei0117",repo:"blitz-ad",message:"Phase 2 B列修正",date:"2026-04-03T06:00:00Z",files:2,additions:20,deletions:5}],weekly_trend:{labels:["03-28","03-29","03-30","03-31","04-01","04-02","04-03"],progress:[5,8,10,12,15,18,20],commits:[2,1,3,2,4,3,5]}}}
 
-// メンバーカラー
-const MC=[
-    {bg:'from-blue-500/20 to-blue-600/10',text:'text-blue-300',border:'border-blue-500/30',dot:'bg-blue-400'},
-    {bg:'from-purple-500/20 to-purple-600/10',text:'text-purple-300',border:'border-purple-500/30',dot:'bg-purple-400'},
-    {bg:'from-emerald-500/20 to-emerald-600/10',text:'text-emerald-300',border:'border-emerald-500/30',dot:'bg-emerald-400'},
-    {bg:'from-orange-500/20 to-orange-600/10',text:'text-orange-300',border:'border-orange-500/30',dot:'bg-orange-400'},
-    {bg:'from-pink-500/20 to-pink-600/10',text:'text-pink-300',border:'border-pink-500/30',dot:'bg-pink-400'},
-];
-const mcMap={};let ci=0;
-function gmc(l){if(!l)return{bg:'from-gray-500/10 to-gray-600/5',text:'text-gray-500',border:'border-gray-600/20',dot:'bg-gray-500'};if(!mcMap[l]){mcMap[l]=MC[ci%MC.length];ci++}return mcMap[l]}
-function gsn(l){if(!l)return'未設定';const p=l.split('-');return p.length>=2?p[0]:l.length>12?l.substring(0,12):l}
+// カラー
+const COLORS=[{bg:'#3b82f6',light:'rgba(59,130,246,0.12)',text:'#93c5fd'},{bg:'#8b5cf6',light:'rgba(139,92,246,0.12)',text:'#c4b5fd'},{bg:'#10b981',light:'rgba(16,185,129,0.12)',text:'#6ee7b7'},{bg:'#f59e0b',light:'rgba(245,158,11,0.12)',text:'#fcd34d'},{bg:'#ec4899',light:'rgba(236,72,153,0.12)',text:'#f9a8d4'}];
+const cmap={};let ci=0;
+function gc(l){if(!l)return COLORS[4];if(!cmap[l]){cmap[l]=COLORS[ci%COLORS.length];ci++}return cmap[l]}
+function sn(l){if(!l)return'?';const p=l.split('-');return p.length>=2?p[0]:l.length>10?l.substring(0,10):l}
 
-function renderDashboard(data){
-    document.getElementById('last-updated').textContent='更新: '+new Date(data.generated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
-    const hm={green:{icon:'🟢',label:'順調',glow:'glow-green'},yellow:{icon:'🟡',label:'注意',glow:'glow-yellow'},red:{icon:'🔴',label:'要対応',glow:'glow-red'}};
-    const h=hm[data.team_health]||hm.yellow;
-    document.getElementById('health-status').textContent=h.icon;
-    document.getElementById('health-label').className=`text-sm font-medium ${data.team_health==='green'?'text-green-400':data.team_health==='red'?'text-red-400':'text-yellow-400'}`;
-    document.getElementById('health-label').textContent=h.label;
-    document.getElementById('health-card').className=`fade-up fade-up-1 glass rounded-2xl p-5 ${h.glow}`;
-    document.getElementById('total-progress').textContent=data.total_progress.percent+'%';
-    document.getElementById('total-progress-bar').style.width=data.total_progress.percent+'%';
-    document.getElementById('active-members').textContent=data.active_members.active+'/'+data.active_members.total;
-    document.getElementById('active-members-detail').textContent=data.active_members.active+'名が稼働中';
-    document.getElementById('recent-commits').textContent=data.recent_commit_count;
+function renderAll(d){
+    // サイドバー
+    const hc={green:'#22c55e',yellow:'#eab308',red:'#ef4444'};
+    const hl={green:'順調',yellow:'注意',red:'要対応'};
+    document.getElementById('sidebar-status-dot').style.background=hc[d.team_health]||hc.yellow;
+    document.getElementById('sidebar-status-text').textContent='チーム: '+(hl[d.team_health]||'—');
+    document.getElementById('sidebar-updated').textContent='更新: '+new Date(d.generated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+    // KPI
+    document.getElementById('total-progress').textContent=d.total_progress.percent+'%';
+    document.getElementById('total-progress-bar').style.width=d.total_progress.percent+'%';
+    document.getElementById('total-done').textContent=d.total_progress.done;
+    document.getElementById('total-total').textContent=d.total_progress.total;
+    document.getElementById('active-members').textContent=d.active_members.active+'/'+d.active_members.total;
+    document.getElementById('active-members-detail').textContent=d.active_members.active+'名 稼働中';
+    document.getElementById('recent-commits').textContent=d.recent_commit_count;
+    const totalTools=d.projects.reduce((s,p)=>s+p.tools.length,0);
+    document.getElementById('project-count').textContent=d.projects.length;
+    document.getElementById('tool-count').textContent=totalTools;
 
     // アラート
-    const ac=document.getElementById('alerts-container'),as2=document.getElementById('alerts-section');ac.innerHTML='';
-    if(data.alerts&&data.alerts.length>0){as2.classList.remove('hidden');data.alerts.forEach(a=>{
-        const cm={error:'bg-red-500/10 border-red-500/20 text-red-300',warning:'bg-yellow-500/10 border-yellow-500/20 text-yellow-300',info:'bg-blue-500/10 border-blue-500/20 text-blue-300'};
-        const im={error:'✕',warning:'!',info:'i'};
-        ac.innerHTML+=`<div class="flex items-center gap-3 px-4 py-3 rounded-xl border ${cm[a.type]||cm.info}"><span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold">${im[a.type]||'i'}</span><span class="text-sm">${a.message}</span></div>`})}
-    else{as2.classList.add('hidden')}
+    const ac=document.getElementById('alerts-container');ac.innerHTML='';
+    (d.alerts||[]).forEach(a=>{
+        const c={error:{border:'#ef4444',bg:'rgba(239,68,68,0.06)',text:'#fca5a5'},warning:{border:'#eab308',bg:'rgba(234,179,8,0.06)',text:'#fde68a'},info:{border:'#3b82f6',bg:'rgba(59,130,246,0.06)',text:'#93c5fd'}};
+        const s=c[a.type]||c.info;
+        ac.innerHTML+=`<div class="alert-bar" style="border-color:${s.border};background:${s.bg};color:${s.text}">${a.message}</div>`;
+    });
 
-    // プロジェクト別
-    const pc=document.getElementById('projects-container');pc.innerHTML='';let ti=0;
-    data.projects.forEach(proj=>{
-        if(proj.tools.length===0)return;
-        // プロジェクトヘッダー
-        const projDone=proj.tools.reduce((s,t)=>s+t.done,0);
-        const projTotal=proj.tools.reduce((s,t)=>s+t.total,0);
-        const projPct=projTotal>0?Math.round(projDone/projTotal*100):0;
-        pc.innerHTML+=`<div class="mb-1 mt-4 first:mt-0 flex items-center gap-3"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">${proj.name}</span><span class="text-[10px] text-gray-600">${projDone}/${projTotal} (${projPct}%)</span><div class="flex-1 h-px bg-white/5"></div></div>`;
+    // Overview Projects（コンパクトカード）
+    const op=document.getElementById('overview-projects');op.innerHTML='';
+    d.projects.forEach(proj=>{
+        if(!proj.tools.length)return;
+        const done=proj.tools.reduce((s,t)=>s+t.done,0);
+        const total=proj.tools.reduce((s,t)=>s+t.total,0);
+        const pct=total>0?Math.round(done/total*100):0;
+        const assignees=[...new Set(proj.tools.map(t=>t.assignee).filter(Boolean))];
+        const avatars=assignees.slice(0,3).map(a=>{const c=gc(a);return`<div class="avatar" style="background:${c.light};color:${c.text};width:24px;height:24px;font-size:10px;margin-left:-6px;border:2px solid var(--surface)">${sn(a).charAt(0).toUpperCase()}</div>`}).join('');
+        op.innerHTML+=`
+        <div class="project-card" style="padding:16px 20px">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-semibold">${proj.name}</span>
+                    <span class="text-[11px]" style="color:var(--text3)">${proj.tools.length} tools</span>
+                </div>
+                <div class="flex items-center">${avatars?'<div class="flex items-center ml-2" style="padding-left:6px">'+avatars+'</div>':''}</div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="flex-1 progress-thin"><div class="progress-fill" style="width:${pct}%;background:${pct>=80?'#22c55e':pct>0?'var(--accent)':'var(--border)'}"></div></div>
+                <span class="text-xs font-semibold" style="color:${pct>=80?'#22c55e':pct>0?'var(--text2)':'var(--text3)'}">${pct}%</span>
+                <span class="text-[11px]" style="color:var(--text3)">${done}/${total}</span>
+            </div>
+        </div>`;
+    });
 
+    // Full Projects View
+    const pf=document.getElementById('projects-full');pf.innerHTML='';let ti=0;
+    d.projects.forEach(proj=>{
+        if(!proj.tools.length)return;
+        let toolsHtml='';
         proj.tools.forEach(tool=>{
             const idx=ti++;
             const pct=tool.total>0?Math.round(tool.done/tool.total*100):0;
-            const sm={green:{dot:'bg-green-400',bar:'bg-gradient-to-r from-green-500 to-emerald-400',label:'完了',lc:'text-green-400'},yellow:{dot:'bg-yellow-400 pulse-dot',bar:'bg-gradient-to-r from-yellow-500 to-amber-400',label:'進行中',lc:'text-yellow-400'},red:{dot:'bg-red-400',bar:'bg-gradient-to-r from-red-500 to-rose-400',label:'未着手',lc:'text-red-400'},unknown:{dot:'bg-gray-600',bar:'bg-gray-600',label:'未設定',lc:'text-gray-600'}};
-            const s=sm[tool.status]||sm.unknown;
-            const mc2=gmc(tool.assignee);
-            const assignee=tool.assignee?`<span class="text-xs font-medium bg-gradient-to-r ${mc2.bg} ${mc2.text} px-3 py-1 rounded-full border ${mc2.border}">${gsn(tool.assignee)}</span>`:`<span class="text-[11px] text-gray-600">担当未設定</span>`;
-            const taskLabel=tool.total>0?`${tool.done}/${tool.total}`:'—';
+            const sc={green:'#22c55e',yellow:'#eab308',red:'#ef4444',unknown:'#3f3f46'};
+            const sl={green:'完了',yellow:'進行中',red:'未着手',unknown:'—'};
+            const dotColor=sc[tool.status]||sc.unknown;
+            const c=gc(tool.assignee);
+            const badge=tool.assignee?`<span class="badge" style="background:${c.light};color:${c.text}">${sn(tool.assignee)}</span>`:'';
             const hd=(tool.remaining_tasks&&tool.remaining_tasks.length>0)||(tool.completed_tasks&&tool.completed_tasks.length>0);
-            const chev=hd?`<span class="chevron text-gray-600 text-[10px]" id="chevron-${idx}">▶</span>`:'<span class="w-3"></span>';
             let det='';
             if(hd){let ts='';
-                if(tool.remaining_tasks&&tool.remaining_tasks.length>0){ts+=`<p class="text-[10px] text-gray-500 uppercase tracking-wider mb-2">残りタスク (${tool.remaining_tasks.length})</p>`;tool.remaining_tasks.forEach(t=>{ts+=`<div class="flex items-start gap-2 py-1.5 border-b border-white/3 last:border-0"><span class="text-gray-600 text-xs mt-0.5">○</span><span class="text-sm text-gray-400">${t}</span></div>`})}
-                if(tool.completed_tasks&&tool.completed_tasks.length>0){ts+=`<p class="text-[10px] text-gray-500 uppercase tracking-wider mt-4 mb-2">完了 (${tool.completed_tasks.length})</p>`;tool.completed_tasks.forEach(t=>{ts+=`<div class="flex items-start gap-2 py-1"><span class="text-green-500 text-xs">✓</span><span class="text-sm text-gray-600 line-through">${t}</span></div>`})}
-                det=`<div class="task-detail" id="detail-${idx}"><div class="pt-3 mt-2 border-t border-white/5 px-2 pb-2">${ts}</div></div>`}
-
-            pc.innerHTML+=`
-            <div class="glass-light rounded-xl overflow-hidden glass-hover transition-all">
-                <div class="tool-row px-4 py-3 flex items-center gap-3" onclick="toggleDetail(${idx})">
-                    ${chev}
-                    <div class="w-2 h-2 rounded-full ${s.dot} flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                            <span class="text-sm font-medium text-gray-200">${tool.name}</span>
-                            ${assignee}
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden">
-                                <div class="progress-bar ${s.bar} h-1.5 rounded-full" style="width:${pct}%"></div>
-                            </div>
-                            <span class="text-[11px] text-gray-500 flex-shrink-0 w-10 text-right">${taskLabel}</span>
-                        </div>
+                if(tool.remaining_tasks&&tool.remaining_tasks.length>0){tool.remaining_tasks.forEach(t=>{ts+=`<div class="flex items-center gap-2 py-1.5" style="border-bottom:1px solid rgba(255,255,255,0.03)"><span style="color:var(--text3);font-size:11px">○</span><span style="font-size:13px;color:var(--text2)">${t}</span></div>`})}
+                if(tool.completed_tasks&&tool.completed_tasks.length>0){tool.completed_tasks.forEach(t=>{ts+=`<div class="flex items-center gap-2 py-1.5"><span style="color:#22c55e;font-size:11px">✓</span><span style="font-size:13px;color:var(--text3);text-decoration:line-through">${t}</span></div>`})}
+                det=`<div class="task-detail" id="detail-${idx}" style="padding:0 16px"><div style="padding:8px 0;border-top:1px solid var(--border)">${ts}</div></div>`}
+            toolsHtml+=`
+            <div class="tool-item" onclick="toggleDetail(${idx})">
+                <div class="dot" style="background:${dotColor}"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm">${tool.name}</span>${badge}
                     </div>
-                    <span class="text-lg font-bold ${pct===100?'text-green-400':pct>0?'text-white':'text-gray-700'} w-14 text-right">${tool.total>0?pct+'%':'—'}</span>
                 </div>
-                ${det}
-            </div>`})});
+                <div class="flex items-center gap-3">
+                    <div class="progress-thin" style="width:80px"><div class="progress-fill" style="width:${pct}%;background:${dotColor}"></div></div>
+                    <span class="text-xs font-semibold" style="color:var(--text2);width:36px;text-align:right">${tool.total>0?pct+'%':'—'}</span>
+                    <span class="text-[11px]" style="color:var(--text3);width:40px;text-align:right">${tool.total>0?tool.done+'/'+tool.total:'—'}</span>
+                </div>
+            </div>${det}`;
+        });
+        const done=proj.tools.reduce((s,t)=>s+t.done,0);
+        const total=proj.tools.reduce((s,t)=>s+t.total,0);
+        pf.innerHTML+=`<div class="project-card"><div style="padding:14px 16px;border-bottom:1px solid var(--border)" class="flex items-center justify-between"><span class="text-sm font-semibold">${proj.name}</span><span class="text-xs" style="color:var(--text3)">${done}/${total} tasks</span></div>${toolsHtml}</div>`;
+    });
 
-    // メンバー別
-    const mbc=document.getElementById('members-container');mbc.innerHTML='';
-    data.members.forEach(m=>{
-        const mc2=gmc(m.login);
+    // Members
+    const om=document.getElementById('overview-members');om.innerHTML='';
+    const mf=document.getElementById('members-full');mf.innerHTML='';
+    d.members.forEach(m=>{
+        const c=gc(m.login);
         const isA=m.status==='active';
-        const badge=isA?`<span class="flex items-center gap-1 text-[10px] text-green-400"><span class="w-1.5 h-1.5 rounded-full bg-green-400 pulse-dot"></span>稼働中</span>`
-            :(m.last_push?`<span class="text-[10px] text-yellow-500">⚠ pushなし</span>`:`<span class="text-[10px] text-gray-600">未セットアップ</span>`);
-        const wt=m.working_tool&&m.working_tool!=='-'?m.working_tool:m.working_on;
-        mbc.innerHTML+=`
-        <div class="glass-light rounded-xl p-3.5 glass-hover transition-all flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br ${mc2.bg} flex items-center justify-center text-sm ${mc2.text} font-bold border ${mc2.border} flex-shrink-0">${gsn(m.login).charAt(0).toUpperCase()}</div>
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2"><span class="text-sm font-medium text-gray-200">${gsn(m.login)}</span>${badge}</div>
-                <p class="text-[11px] text-gray-600 mt-0.5 truncate">${wt!=='-'?wt:''} ${m.commits_today>0?'・'+m.commits_today+'件コミット':''}</p>
+        const badge=isA?`<span class="dot" style="background:#22c55e;width:6px;height:6px"></span><span class="text-[11px]" style="color:#22c55e">稼働中</span>`
+            :(m.last_push?`<span class="text-[11px]" style="color:#eab308">pushなし</span>`:`<span class="text-[11px]" style="color:var(--text3)">未セットアップ</span>`);
+        const wt=m.working_tool&&m.working_tool!=='-'?m.working_tool:(m.working_on!=='-'?m.working_on:'');
+        const row=`
+        <div class="member-row">
+            <div class="avatar" style="background:${c.light};color:${c.text}">${sn(m.login).charAt(0).toUpperCase()}</div>
+            <div class="flex-1">
+                <div class="flex items-center gap-2"><span class="text-sm font-medium">${sn(m.login)}</span>${badge}</div>
+                <div class="text-[11px] mt-0.5" style="color:var(--text3)">${wt} ${m.commits_today>0?'・'+m.commits_today+' commits':''}</div>
             </div>
-        </div>`});
+            <div class="text-[11px] text-right" style="color:var(--text3)">${m.last_push||'—'}</div>
+        </div>`;
+        om.innerHTML+=row;
+        // Full view gets larger cards
+        mf.innerHTML+=`<div class="stat-card" style="padding:16px 20px"><div class="flex items-center gap-3"><div class="avatar" style="background:${c.light};color:${c.text};width:40px;height:40px;font-size:16px">${sn(m.login).charAt(0).toUpperCase()}</div><div class="flex-1"><div class="flex items-center gap-2"><span class="font-semibold">${m.login}</span>${badge}</div><div class="text-xs mt-1" style="color:var(--text3)">最終push: ${m.last_push||'—'} / 作業中: ${wt||'—'} / 本日: ${m.commits_today}件</div></div></div></div>`;
+    });
 
-    // トレンド
+    // Commits
+    const oc=document.getElementById('overview-commits');oc.innerHTML='';
+    const af=document.getElementById('activity-full');af.innerHTML='';
+    (d.recent_commits||[]).forEach((commit,i)=>{
+        const c=gc(commit.author);
+        const dt=new Date(commit.date).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+        const row=`<div class="commit-row"><div class="flex items-center gap-3"><div class="avatar" style="background:${c.light};color:${c.text};width:24px;height:24px;font-size:10px">${sn(commit.author).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><div class="text-sm truncate">${commit.message}</div><div class="text-[11px] mt-0.5" style="color:var(--text3)">${sn(commit.author)} · ${commit.repo} · ${dt} · ${commit.files}files +${commit.additions}/-${commit.deletions}</div></div></div></div>`;
+        if(i<5)oc.innerHTML+=row;
+        af.innerHTML+=row;
+    });
+
+    // Trend
     const ctx=document.getElementById('trend-chart').getContext('2d');
     if(window.tc)window.tc.destroy();
-    const gradient=ctx.createLinearGradient(0,0,0,300);gradient.addColorStop(0,'rgba(59,130,246,0.15)');gradient.addColorStop(1,'rgba(59,130,246,0)');
-    const gradient2=ctx.createLinearGradient(0,0,0,300);gradient2.addColorStop(0,'rgba(139,92,246,0.15)');gradient2.addColorStop(1,'rgba(139,92,246,0)');
-    window.tc=new Chart(ctx,{type:'line',data:{labels:data.weekly_trend.labels,datasets:[
-        {label:'進捗率 (%)',data:data.weekly_trend.progress,borderColor:'#3b82f6',backgroundColor:gradient,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#3b82f6',borderWidth:2,yAxisID:'y'},
-        {label:'コミット数',data:data.weekly_trend.commits,borderColor:'#8b5cf6',backgroundColor:gradient2,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#8b5cf6',borderWidth:2,yAxisID:'y1'}
-    ]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#6b7280',font:{size:11},boxWidth:12,padding:16}}},scales:{
-        x:{ticks:{color:'#4b5563',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
-        y:{type:'linear',position:'left',title:{display:true,text:'進捗率',color:'#6b7280',font:{size:10}},min:0,max:100,ticks:{color:'#4b5563',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
-        y1:{type:'linear',position:'right',title:{display:true,text:'コミット',color:'#6b7280',font:{size:10}},min:0,ticks:{color:'#4b5563',font:{size:10}},grid:{drawOnChartArea:false}}
+    window.tc=new Chart(ctx,{type:'line',data:{labels:d.weekly_trend.labels,datasets:[
+        {label:'進捗率',data:d.weekly_trend.progress,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.05)',fill:true,tension:0.4,pointRadius:2,pointBackgroundColor:'#3b82f6',borderWidth:1.5,yAxisID:'y'},
+        {label:'コミット',data:d.weekly_trend.commits,borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.05)',fill:true,tension:0.4,pointRadius:2,pointBackgroundColor:'#8b5cf6',borderWidth:1.5,yAxisID:'y1'}
+    ]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#71717a',font:{size:10,family:'Inter'},boxWidth:8,padding:12}}},scales:{
+        x:{ticks:{color:'#52525b',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
+        y:{position:'left',min:0,max:100,ticks:{color:'#52525b',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
+        y1:{position:'right',min:0,ticks:{color:'#52525b',font:{size:10}},grid:{drawOnChartArea:false}}
     }}});
-
-    // 直近コミット
-    const cc=document.getElementById('commits-container');cc.innerHTML='';
-    (data.recent_commits||[]).slice(0,8).forEach(c=>{
-        const d=new Date(c.date).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
-        const mc2=gmc(c.author);
-        cc.innerHTML+=`
-        <div class="px-4 py-3 flex items-start gap-3 hover:bg-white/[0.02] transition">
-            <div class="w-7 h-7 rounded-full bg-gradient-to-br ${mc2.bg} flex items-center justify-center text-[10px] ${mc2.text} font-bold border ${mc2.border} flex-shrink-0 mt-0.5">${gsn(c.author).charAt(0).toUpperCase()}</div>
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2"><span class="text-xs font-medium text-gray-300">${gsn(c.author)}</span><span class="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-500">${c.repo}</span><span class="text-[10px] text-gray-700 ml-auto">${d}</span></div>
-                <p class="text-sm text-gray-400 mt-0.5 truncate">${c.message}</p>
-                <span class="text-[10px] text-gray-600">${c.files}files +${c.additions}/-${c.deletions}</span>
-            </div>
-        </div>`});
 }
 
-function toggleDetail(i){const d=document.getElementById('detail-'+i),c=document.getElementById('chevron-'+i);if(!d)return;d.classList.toggle('open');if(c)c.classList.toggle('open')}
+function toggleDetail(i){const d=document.getElementById('detail-'+i);if(d)d.classList.toggle('open')}
 window.addEventListener('DOMContentLoaded',()=>{if(sessionStorage.getItem('authed')==='true')checkAuth()});
 </script>
 </body>
