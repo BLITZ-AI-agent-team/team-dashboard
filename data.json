@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-03T05:57:54Z",
+  "generated_at": "2026-04-03T07:28:01Z",
   "team_health": "red",
   "total_progress": {
     "done": 19,
@@ -10,7 +10,7 @@
     "active": 0,
     "total": 4
   },
-  "recent_commit_count": 16,
+  "recent_commit_count": 19,
   "alerts": [
     {
       "type": "warning",
@@ -63,7 +63,7 @@
           "done": 0,
           "total": 10,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "/ads-setting スキル定義の作成",
             "設定シート読み取り（AI用設定タブ → 案件タブ）の実装",
@@ -84,7 +84,7 @@
           "done": 0,
           "total": 11,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "/ads-yojitsu スキル定義の作成",
             "kpi-analyzer モジュール呼び出しの実装",
@@ -106,7 +106,7 @@
           "done": 5,
           "total": 5,
           "status": "green",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [],
           "completed_tasks": [
             "シートコピー（テンプレート → 当日分）の実装",
@@ -122,7 +122,7 @@
           "done": 0,
           "total": 8,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "設定シート読み取り（AI用設定タブ）の実装",
             "予実シート読み取り（案件別タブ自動検出）の実装",
@@ -141,7 +141,7 @@
           "done": 6,
           "total": 15,
           "status": "yellow",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "FileZillaの「既存ファイルを上書きする場合は確認する」設定がONになっているか確認",
             "サーバーの現状をスクリーンショットで記録（作業前の状態を保存）",
@@ -168,7 +168,7 @@
           "done": 0,
           "total": 6,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "MetaAgent クラスの基本実装（operate / create_campaign）",
             "広告アカウント選択ロジックの実装",
@@ -185,7 +185,7 @@
           "done": 0,
           "total": 6,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "ユーザー確認待ち事項の解消（ドラフト → 確定）",
             "巡回スケジュール管理の実装",
@@ -202,7 +202,7 @@
           "done": 0,
           "total": 7,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "/mtg-minutes スキル定義の作成",
             "kpi-analyzer モジュール呼び出し（freq_warning=1.5）の実装",
@@ -220,7 +220,7 @@
           "done": 0,
           "total": 7,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "月広告費報告シート自動作成（Phase 0A）の実装",
             "Meta請求ページからPDFダウンロードの実装",
@@ -238,7 +238,7 @@
           "done": 0,
           "total": 6,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "Drive検索ロジック（完全一致 → 表記ゆれ → 部分一致フォールバック）の実装",
             "シナリオ一覧シート参照の実装",
@@ -255,7 +255,7 @@
           "done": 1,
           "total": 7,
           "status": "yellow",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "SSH経由VPS接続（ICB管理）の実装",
             "ローカルブラウザ起動（リプラス管理）の実装",
@@ -274,7 +274,7 @@
           "done": 7,
           "total": 23,
           "status": "yellow",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "新タブ作成 + 日程更新機能",
             "新CP検出 + 行追加機能（設定シート比較）",
@@ -309,7 +309,7 @@
           "done": 0,
           "total": 11,
           "status": "red",
-          "assignee": null,
+          "assignee": "kawasumishuhei0117",
           "remaining_tasks": [
             "vps-login の実装・テスト",
             "meta-agent の実装・テスト",
@@ -336,7 +336,7 @@
           "done": 0,
           "total": 0,
           "status": "unknown",
-          "assignee": null,
+          "assignee": "yamamoto-kosuke-ai",
           "remaining_tasks": [],
           "completed_tasks": []
         },
@@ -346,7 +346,7 @@
           "done": 0,
           "total": 0,
           "status": "unknown",
-          "assignee": null,
+          "assignee": "yamamoto-kosuke-ai",
           "remaining_tasks": [],
           "completed_tasks": []
         }
@@ -361,7 +361,7 @@
           "done": 0,
           "total": 0,
           "status": "unknown",
-          "assignee": null,
+          "assignee": "takahashi-saika-maker",
           "remaining_tasks": [],
           "completed_tasks": []
         },
@@ -371,7 +371,7 @@
           "done": 0,
           "total": 0,
           "status": "unknown",
-          "assignee": null,
+          "assignee": "takahashi-saika-maker",
           "remaining_tasks": [],
           "completed_tasks": []
         },
@@ -381,7 +381,7 @@
           "done": 0,
           "total": 0,
           "status": "unknown",
-          "assignee": null,
+          "assignee": "takahashi-saika-maker",
           "remaining_tasks": [],
           "completed_tasks": []
         }
@@ -396,7 +396,7 @@
           "done": 0,
           "total": 0,
           "status": "unknown",
-          "assignee": null,
+          "assignee": "yamamoto-kosuke-ai",
           "remaining_tasks": [],
           "completed_tasks": []
         },
@@ -406,7 +406,7 @@
           "done": 0,
           "total": 0,
           "status": "unknown",
-          "assignee": null,
+          "assignee": "yamamoto-kosuke-ai",
           "remaining_tasks": [],
           "completed_tasks": []
         }
@@ -456,6 +456,93 @@
     }
   ],
   "recent_commits": [
+    {
+      "author": {
+        "login": "kawasumishuhei0117",
+        "id": 260336269,
+        "node_id": "U_kgDOD4RqjQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/260336269?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/kawasumishuhei0117",
+        "html_url": "https://github.com/kawasumishuhei0117",
+        "followers_url": "https://api.github.com/users/kawasumishuhei0117/followers",
+        "following_url": "https://api.github.com/users/kawasumishuhei0117/following{/other_user}",
+        "gists_url": "https://api.github.com/users/kawasumishuhei0117/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/kawasumishuhei0117/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/kawasumishuhei0117/subscriptions",
+        "organizations_url": "https://api.github.com/users/kawasumishuhei0117/orgs",
+        "repos_url": "https://api.github.com/users/kawasumishuhei0117/repos",
+        "events_url": "https://api.github.com/users/kawasumishuhei0117/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/kawasumishuhei0117/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": "blitz-ad",
+      "message": "",
+      "date": "",
+      "files": 1,
+      "additions": 18,
+      "deletions": 0
+    },
+    {
+      "author": {
+        "login": "kawasumishuhei0117",
+        "id": 260336269,
+        "node_id": "U_kgDOD4RqjQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/260336269?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/kawasumishuhei0117",
+        "html_url": "https://github.com/kawasumishuhei0117",
+        "followers_url": "https://api.github.com/users/kawasumishuhei0117/followers",
+        "following_url": "https://api.github.com/users/kawasumishuhei0117/following{/other_user}",
+        "gists_url": "https://api.github.com/users/kawasumishuhei0117/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/kawasumishuhei0117/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/kawasumishuhei0117/subscriptions",
+        "organizations_url": "https://api.github.com/users/kawasumishuhei0117/orgs",
+        "repos_url": "https://api.github.com/users/kawasumishuhei0117/repos",
+        "events_url": "https://api.github.com/users/kawasumishuhei0117/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/kawasumishuhei0117/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": "blitz-ad",
+      "message": "",
+      "date": "",
+      "files": 1,
+      "additions": 68,
+      "deletions": 0
+    },
+    {
+      "author": {
+        "login": "kawasumishuhei0117",
+        "id": 260336269,
+        "node_id": "U_kgDOD4RqjQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/260336269?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/kawasumishuhei0117",
+        "html_url": "https://github.com/kawasumishuhei0117",
+        "followers_url": "https://api.github.com/users/kawasumishuhei0117/followers",
+        "following_url": "https://api.github.com/users/kawasumishuhei0117/following{/other_user}",
+        "gists_url": "https://api.github.com/users/kawasumishuhei0117/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/kawasumishuhei0117/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/kawasumishuhei0117/subscriptions",
+        "organizations_url": "https://api.github.com/users/kawasumishuhei0117/orgs",
+        "repos_url": "https://api.github.com/users/kawasumishuhei0117/repos",
+        "events_url": "https://api.github.com/users/kawasumishuhei0117/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/kawasumishuhei0117/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": "blitz-ad",
+      "message": "",
+      "date": "",
+      "files": 1,
+      "additions": 5,
+      "deletions": 6
+    },
     {
       "author": {
         "login": "kawasumishuhei0117",
@@ -620,33 +707,6 @@
       "deletions": 6
     },
     {
-      "author": "kawasumishuhei0117",
-      "repo": "blitz-ad",
-      "message": "02: E列書き込みをset_acctに修正 + 新規CPS見出しCENTER配置 + 不要ファイル・テストドメイン削除",
-      "date": "2026-04-02T09:40:44Z",
-      "files": 300,
-      "additions": 4,
-      "deletions": 17752
-    },
-    {
-      "author": "kawasumishuhei0117",
-      "repo": "blitz-ad",
-      "message": "初回コミット",
-      "date": "2026-04-02T06:36:07Z",
-      "files": 300,
-      "additions": 44212,
-      "deletions": 109
-    },
-    {
-      "author": "kawasumishuhei0117",
-      "repo": "blitz-ad",
-      "message": "02: Phase 2先頭でB列マージ解除 + s_set依存B列書き込み",
-      "date": "2026-04-02T00:26:24Z",
-      "files": 1,
-      "additions": 12,
-      "deletions": 9
-    },
-    {
       "author": {
         "login": "yamamoto-kosuke-ai",
         "id": 247279877,
@@ -778,7 +838,7 @@
       0,
       0,
       0,
-      16
+      19
     ]
   }
 }
