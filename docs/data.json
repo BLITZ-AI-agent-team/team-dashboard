@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-04-03T07:28:01Z",
+  "generated_at": "2026-04-03T07:33:36Z",
   "team_health": "red",
   "total_progress": {
-    "done": 19,
-    "total": 122,
-    "percent": 15
+    "done": 30,
+    "total": 145,
+    "percent": 20
   },
   "active_members": {
     "active": 0,
@@ -331,24 +331,38 @@
       "name": "direction-tool",
       "tools": [
         {
-          "name": "AI Debate Log - Direction",
-          "file": "archive/debates/2026-03-31-direction-requirements/debate-log.md",
-          "done": 0,
-          "total": 0,
-          "status": "unknown",
-          "assignee": "yamamoto-kosuke-ai",
-          "remaining_tasks": [],
-          "completed_tasks": []
-        },
-        {
           "name": "Direction -",
-          "file": "archive/REQUIREMENTS.md",
-          "done": 0,
-          "total": 0,
-          "status": "unknown",
+          "file": "requirements.md",
+          "done": 11,
+          "total": 23,
+          "status": "yellow",
           "assignee": "yamamoto-kosuke-ai",
-          "remaining_tasks": [],
-          "completed_tasks": []
+          "remaining_tasks": [
+            "全対象フォルダの動画処理完了（6,506本中、処理進行中）",
+            "サムネイルなし既存データへのサムネイル一括生成",
+            "タイムスタンプ尺超過データ（60件）の修正",
+            "処理スキップ（NO SPEECH）のDB記録対応",
+            "rclone設定（Google Drive サービスアカウント認証）",
+            "電源接続トリガー設定（macOS: sleepwatcher/pmset、Windows: Task Scheduler）",
+            "n8n Webhook通知（完了/エラー）",
+            "同期完了後の再スリープ",
+            "参考動画検索（YouTube API + 壁打ち）",
+            "TVer/ABEMA自動画面録画（Playwright + OBS）",
+            "録画のシーン分割・タグ付け・蓄積",
+            "蓄積した参考動画の壁打ち検索"
+          ],
+          "completed_tasks": [
+            "pgvectorスキーマ構築（Neon Serverless）",
+            "動画処理パイプライン（FFmpeg音声抽出・文字起こし・ベクトル化・DB登録）",
+            "セマンティック検索スクリプト（キーワード + ベクトル類似度のハイブリッド）",
+            "Google Drive連携（サービスアカウント・共有ドライブ対応）",
+            "SRT/JSONファイルの自動生成・Google Driveアップロード",
+            "Gemini 3.1 Flash-Lite Previewへの移行（タイムスタンプ精度改善）",
+            "Gemini gemini-embedding-001への移行",
+            "サムネイル生成機能（FFmpegフレーム抽出・Base64・DB保存）",
+            "Web検索画面（n8n Webhook・フォルダ選択ドロップダウン・サムネイル表示）",
+            "大規模バッチ処理スクリプト（Hostinger VPS実行・再開機能・並列処理）"
+          ]
         }
       ]
     },
@@ -390,16 +404,6 @@
     {
       "name": "LPgenerator",
       "tools": [
-        {
-          "name": "Requirements: <spec-slug>",
-          "file": ".claude/skills/sdd-req100/requirements.template.md",
-          "done": 0,
-          "total": 0,
-          "status": "unknown",
-          "assignee": "yamamoto-kosuke-ai",
-          "remaining_tasks": [],
-          "completed_tasks": []
-        },
         {
           "name": "LP自動生成エージェントツール — (v1.0)",
           "file": "docs/lp-generation-proposal-v1.md",
@@ -829,7 +833,7 @@
       0,
       0,
       0,
-      15
+      20
     ],
     "commits": [
       0,

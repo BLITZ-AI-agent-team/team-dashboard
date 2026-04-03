@@ -79,7 +79,19 @@ for repo in repos:
     tree = gh_json(f'api repos/{full}/git/trees/HEAD?recursive=1 --jq "[.tree[] | select(.type==\\"blob\\") | .path]"')
     if isinstance(tree, str):
         tree = json.loads(tree) if tree else []
-    md_files = [f for f in tree if f.endswith('.md') and '_guide.' not in f and 'MTG' not in f and 'session_handoff' not in f and 'user_tasks' not in f]
+    md_files = [f for f in tree if f.endswith('.md')
+        and '_guide.' not in f.lower()
+        and 'MTG' not in f
+        and 'session_handoff' not in f
+        and 'user_tasks' not in f
+        and not f.startswith('.claude/')
+        and not f.startswith('archive/')
+        and not f.startswith('docs/research/')
+        and 'SESSION_HANDOFF' not in f
+        and 'CLAUDE.md' not in f
+        and 'README.md' not in f
+        and 'GITHUB_ISSUES' not in f
+    ]
 
     # コミットメッセージから担当者×ツール紐づけを構築
     # コミットメッセージの先頭番号(例: "02: ...")からツールファイルを推定
