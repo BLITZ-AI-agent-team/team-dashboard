@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLITZ AI Agent Team - Dashboard v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        body { background: #0b0f1a; }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); }
+        .glass-light { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+        .glass-hover:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); }
+        .glow-blue { box-shadow: 0 0 20px rgba(59,130,246,0.15); }
+        .glow-green { box-shadow: 0 0 20px rgba(34,197,94,0.15); }
+        .glow-yellow { box-shadow: 0 0 20px rgba(234,179,8,0.12); }
+        .glow-red { box-shadow: 0 0 20px rgba(239,68,68,0.15); }
+        .progress-bar { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .stat-number { background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .fade-up-1 { animation-delay: 0.05s; }
+        .fade-up-2 { animation-delay: 0.1s; }
+        .fade-up-3 { animation-delay: 0.15s; }
+        .fade-up-4 { animation-delay: 0.2s; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+        .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+        .task-detail { max-height:0; overflow:hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s; opacity:0; }
+        .task-detail.open { max-height:800px; opacity:1; }
+        .tool-row { cursor:pointer; transition: background 0.2s; }
+        .tool-row:hover { background: rgba(255,255,255,0.04); }
+        .chevron { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .chevron.open { transform: rotate(90deg); }
+        .gradient-border { position:relative; }
+        .gradient-border::before { content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(139,92,246,0.3),rgba(236,72,153,0.2)); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+        .section-title { letter-spacing: 0.12em; }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+    </style>
+    <script>
+        tailwind.config = { theme: { extend: { colors: {
+            surface: { 1:'#0b0f1a', 2:'#111827', 3:'#1a2235', 4:'#243049' },
+            accent: { blue:'#3b82f6', purple:'#8b5cf6', pink:'#ec4899', cyan:'#06b6d4' }
+        }}}}
+    </script>
+</head>
+<body class="min-h-screen text-white">
+
+<!-- 背景グラデーション -->
+<div class="fixed inset-0 pointer-events-none">
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl"></div>
+</div>
+
+<!-- パスワード認証 -->
+<div id="auth-screen" class="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50">
+    <div class="glass rounded-2xl p-8 w-96 text-center gradient-border">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl">⚡</div>
+        <h2 class="text-xl font-bold text-white mb-1">Team Dashboard</h2>
+        <p class="text-gray-500 text-sm mb-6">社内メンバー専用</p>
+        <input id="password-input" type="password" placeholder="パスワード"
+               class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none mb-4 transition"
+               onkeydown="if(event.key==='Enter')checkAuth()">
+        <button onclick="checkAuth()"
+                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-500 hover:to-purple-500 transition-all shadow-lg shadow-blue-600/20">
+            ログイン
+        </button>
+        <p id="auth-error" class="text-red-400 text-sm mt-3 hidden">パスワードが違います</p>
+    </div>
+</div>
+
+<!-- メインダッシュボード -->
+<div id="dashboard" class="hidden relative">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-40 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg font-bold">⚡</div>
+                <div>
+                    <h1 class="text-base font-bold text-white tracking-tight">BLITZ AI Agent Team</h1>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Progress Dashboard</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="last-updated" class="text-[11px] text-gray-600"></span>
+                <button onclick="loadData()" class="text-xs glass-light hover:bg-white/10 px-3 py-1.5 rounded-lg transition text-gray-400 hover:text-white">
+                    ↻ 更新
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+        <!-- ① KPIカード -->
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div id="health-card" class="fade-up fade-up-1 glass rounded-2xl p-5 glow-blue">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-3">チーム状態</p>
+                <div id="health-status" class="text-4xl mb-1"></div>
+                <p id="health-label" class="text-sm font-medium"></p>
+            </div>
+            <div class="fade-up fade-up-2 glass rounded-2xl p-5">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-3">全体進捗</p>
+                <div id="total-progress" class="text-4xl font-bold stat-number mb-2"></div>
+                <div class="bg-white/5 rounded-full h-1.5 overflow-hidden">
+                    <div id="total-progress-bar" class="progress-bar bg-gradient-to-r from-blue-500 to-cyan-400 h-1.5 rounded-full" style="width:0%"></div>
+                </div>
+            </div>
+            <div class="fade-up fade-up-3 glass rounded-2xl p-5">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-3">アクティブ</p>
+                <div id="active-members" class="text-4xl font-bold stat-number"></div>
+                <p id="active-members-detail" class="text-xs text-gray-500 mt-1"></p>
+            </div>
+            <div class="fade-up fade-up-4 glass rounded-2xl p-5">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-3">コミット</p>
+                <div id="recent-commits" class="text-4xl font-bold stat-number"></div>
+                <p class="text-xs text-gray-500 mt-1">過去24時間</p>
+            </div>
+        </section>
+
+        <!-- ② アラート -->
+        <section id="alerts-section" class="hidden">
+            <div id="alerts-container" class="space-y-2"></div>
+        </section>
+
+        <!-- ③ プロジェクト別進捗 -->
+        <section class="fade-up">
+            <h2 class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-4">プロジェクト別進捗</h2>
+            <div id="projects-container" class="space-y-2"></div>
+        </section>
+
+        <!-- ④ メンバー別 + ⑤ トレンド（2カラム）-->
+        <section class="grid grid-cols-1 lg:grid-cols-5 gap-6 fade-up">
+            <div class="lg:col-span-2">
+                <h2 class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-4">メンバー</h2>
+                <div id="members-container" class="space-y-2"></div>
+            </div>
+            <div class="lg:col-span-3">
+                <h2 class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-4">週次トレンド</h2>
+                <div class="glass rounded-2xl p-5">
+                    <canvas id="trend-chart" height="140"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ⑥ 直近コミット -->
+        <section class="fade-up">
+            <h2 class="text-[10px] text-gray-500 uppercase tracking-widest section-title mb-4">直近のコミット</h2>
+            <div id="commits-container" class="glass rounded-2xl divide-y divide-white/5 overflow-hidden"></div>
+        </section>
+    </main>
+
+    <footer class="max-w-7xl mx-auto px-6 py-10 text-center text-[11px] text-gray-700">
+        BLITZ AI Agent Team &middot; Auto-generated Dashboard
+    </footer>
+</div>
+
+<script>
+const PASS_HASH = '3d7cdd4da6a7fc866c7806fedb761c577010353dd6aa5b656d2fd381ba8aa140';
+async function sha256(m){const b=new TextEncoder().encode(m);const h=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function checkAuth(){
+    if(sessionStorage.getItem('authed')==='true'){document.getElementById('auth-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');loadData();return}
+    const hash=await sha256(document.getElementById('password-input').value);
+    if(hash===PASS_HASH){sessionStorage.setItem('authed','true');document.getElementById('auth-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');loadData()}
+    else{document.getElementById('auth-error').classList.remove('hidden')}
+}
+async function loadData(){try{const r=await fetch('data.json?t='+Date.now());renderDashboard(await r.json())}catch(e){renderDashboard(getSampleData())}}
+function getSampleData(){return{generated_at:new Date().toISOString(),team_health:"yellow",total_progress:{done:30,total:150,percent:20},active_members:{active:2,total:5},recent_commit_count:5,alerts:[{type:"warning",message:"3名が直近2日間pushしていません"}],projects:[{name:"blitz-ad",tools:[{name:"予実シート自動化 (v4)",done:7,total:23,status:"yellow",assignee:"kawasumishuhei0117",remaining_tasks:["Gemini分析","シート書き込み"],completed_tasks:["Firebase認証","API連携"]}]}],members:[{login:"kawasumishuhei0117",display:"kawasumishuhei0117",last_push:"2026-04-03",commits_today:3,status:"active",working_on:"blitz-ad",working_tool:"予実シート自動化"}],recent_commits:[{author:"kawasumishuhei0117",repo:"blitz-ad",message:"Phase 2 B列修正",date:"2026-04-03T06:00:00Z",files:2,additions:20,deletions:5}],weekly_trend:{labels:["03-28","03-29","03-30","03-31","04-01","04-02","04-03"],progress:[5,8,10,12,15,18,20],commits:[2,1,3,2,4,3,5]}}}
+
+// メンバーカラー
+const MC=[
+    {bg:'from-blue-500/20 to-blue-600/10',text:'text-blue-300',border:'border-blue-500/30',dot:'bg-blue-400'},
+    {bg:'from-purple-500/20 to-purple-600/10',text:'text-purple-300',border:'border-purple-500/30',dot:'bg-purple-400'},
+    {bg:'from-emerald-500/20 to-emerald-600/10',text:'text-emerald-300',border:'border-emerald-500/30',dot:'bg-emerald-400'},
+    {bg:'from-orange-500/20 to-orange-600/10',text:'text-orange-300',border:'border-orange-500/30',dot:'bg-orange-400'},
+    {bg:'from-pink-500/20 to-pink-600/10',text:'text-pink-300',border:'border-pink-500/30',dot:'bg-pink-400'},
+];
+const mcMap={};let ci=0;
+function gmc(l){if(!l)return{bg:'from-gray-500/10 to-gray-600/5',text:'text-gray-500',border:'border-gray-600/20',dot:'bg-gray-500'};if(!mcMap[l]){mcMap[l]=MC[ci%MC.length];ci++}return mcMap[l]}
+function gsn(l){if(!l)return'未設定';const p=l.split('-');return p.length>=2?p[0]:l.length>12?l.substring(0,12):l}
+
+function renderDashboard(data){
+    document.getElementById('last-updated').textContent='更新: '+new Date(data.generated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const hm={green:{icon:'🟢',label:'順調',glow:'glow-green'},yellow:{icon:'🟡',label:'注意',glow:'glow-yellow'},red:{icon:'🔴',label:'要対応',glow:'glow-red'}};
+    const h=hm[data.team_health]||hm.yellow;
+    document.getElementById('health-status').textContent=h.icon;
+    document.getElementById('health-label').className=`text-sm font-medium ${data.team_health==='green'?'text-green-400':data.team_health==='red'?'text-red-400':'text-yellow-400'}`;
+    document.getElementById('health-label').textContent=h.label;
+    document.getElementById('health-card').className=`fade-up fade-up-1 glass rounded-2xl p-5 ${h.glow}`;
+    document.getElementById('total-progress').textContent=data.total_progress.percent+'%';
+    document.getElementById('total-progress-bar').style.width=data.total_progress.percent+'%';
+    document.getElementById('active-members').textContent=data.active_members.active+'/'+data.active_members.total;
+    document.getElementById('active-members-detail').textContent=data.active_members.active+'名が稼働中';
+    document.getElementById('recent-commits').textContent=data.recent_commit_count;
+
+    // アラート
+    const ac=document.getElementById('alerts-container'),as2=document.getElementById('alerts-section');ac.innerHTML='';
+    if(data.alerts&&data.alerts.length>0){as2.classList.remove('hidden');data.alerts.forEach(a=>{
+        const cm={error:'bg-red-500/10 border-red-500/20 text-red-300',warning:'bg-yellow-500/10 border-yellow-500/20 text-yellow-300',info:'bg-blue-500/10 border-blue-500/20 text-blue-300'};
+        const im={error:'✕',warning:'!',info:'i'};
+        ac.innerHTML+=`<div class="flex items-center gap-3 px-4 py-3 rounded-xl border ${cm[a.type]||cm.info}"><span class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold">${im[a.type]||'i'}</span><span class="text-sm">${a.message}</span></div>`})}
+    else{as2.classList.add('hidden')}
+
+    // プロジェクト別
+    const pc=document.getElementById('projects-container');pc.innerHTML='';let ti=0;
+    data.projects.forEach(proj=>{
+        if(proj.tools.length===0)return;
+        // プロジェクトヘッダー
+        const projDone=proj.tools.reduce((s,t)=>s+t.done,0);
+        const projTotal=proj.tools.reduce((s,t)=>s+t.total,0);
+        const projPct=projTotal>0?Math.round(projDone/projTotal*100):0;
+        pc.innerHTML+=`<div class="mb-1 mt-4 first:mt-0 flex items-center gap-3"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">${proj.name}</span><span class="text-[10px] text-gray-600">${projDone}/${projTotal} (${projPct}%)</span><div class="flex-1 h-px bg-white/5"></div></div>`;
+
+        proj.tools.forEach(tool=>{
+            const idx=ti++;
+            const pct=tool.total>0?Math.round(tool.done/tool.total*100):0;
+            const sm={green:{dot:'bg-green-400',bar:'bg-gradient-to-r from-green-500 to-emerald-400',label:'完了',lc:'text-green-400'},yellow:{dot:'bg-yellow-400 pulse-dot',bar:'bg-gradient-to-r from-yellow-500 to-amber-400',label:'進行中',lc:'text-yellow-400'},red:{dot:'bg-red-400',bar:'bg-gradient-to-r from-red-500 to-rose-400',label:'未着手',lc:'text-red-400'},unknown:{dot:'bg-gray-600',bar:'bg-gray-600',label:'未設定',lc:'text-gray-600'}};
+            const s=sm[tool.status]||sm.unknown;
+            const mc2=gmc(tool.assignee);
+            const assignee=tool.assignee?`<span class="text-xs font-medium bg-gradient-to-r ${mc2.bg} ${mc2.text} px-3 py-1 rounded-full border ${mc2.border}">${gsn(tool.assignee)}</span>`:`<span class="text-[11px] text-gray-600">担当未設定</span>`;
+            const taskLabel=tool.total>0?`${tool.done}/${tool.total}`:'—';
+            const hd=(tool.remaining_tasks&&tool.remaining_tasks.length>0)||(tool.completed_tasks&&tool.completed_tasks.length>0);
+            const chev=hd?`<span class="chevron text-gray-600 text-[10px]" id="chevron-${idx}">▶</span>`:'<span class="w-3"></span>';
+            let det='';
+            if(hd){let ts='';
+                if(tool.remaining_tasks&&tool.remaining_tasks.length>0){ts+=`<p class="text-[10px] text-gray-500 uppercase tracking-wider mb-2">残りタスク (${tool.remaining_tasks.length})</p>`;tool.remaining_tasks.forEach(t=>{ts+=`<div class="flex items-start gap-2 py-1.5 border-b border-white/3 last:border-0"><span class="text-gray-600 text-xs mt-0.5">○</span><span class="text-sm text-gray-400">${t}</span></div>`})}
+                if(tool.completed_tasks&&tool.completed_tasks.length>0){ts+=`<p class="text-[10px] text-gray-500 uppercase tracking-wider mt-4 mb-2">完了 (${tool.completed_tasks.length})</p>`;tool.completed_tasks.forEach(t=>{ts+=`<div class="flex items-start gap-2 py-1"><span class="text-green-500 text-xs">✓</span><span class="text-sm text-gray-600 line-through">${t}</span></div>`})}
+                det=`<div class="task-detail" id="detail-${idx}"><div class="pt-3 mt-2 border-t border-white/5 px-2 pb-2">${ts}</div></div>`}
+
+            pc.innerHTML+=`
+            <div class="glass-light rounded-xl overflow-hidden glass-hover transition-all">
+                <div class="tool-row px-4 py-3 flex items-center gap-3" onclick="toggleDetail(${idx})">
+                    ${chev}
+                    <div class="w-2 h-2 rounded-full ${s.dot} flex-shrink-0"></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                            <span class="text-sm font-medium text-gray-200">${tool.name}</span>
+                            ${assignee}
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                                <div class="progress-bar ${s.bar} h-1.5 rounded-full" style="width:${pct}%"></div>
+                            </div>
+                            <span class="text-[11px] text-gray-500 flex-shrink-0 w-10 text-right">${taskLabel}</span>
+                        </div>
+                    </div>
+                    <span class="text-lg font-bold ${pct===100?'text-green-400':pct>0?'text-white':'text-gray-700'} w-14 text-right">${tool.total>0?pct+'%':'—'}</span>
+                </div>
+                ${det}
+            </div>`})});
+
+    // メンバー別
+    const mbc=document.getElementById('members-container');mbc.innerHTML='';
+    data.members.forEach(m=>{
+        const mc2=gmc(m.login);
+        const isA=m.status==='active';
+        const badge=isA?`<span class="flex items-center gap-1 text-[10px] text-green-400"><span class="w-1.5 h-1.5 rounded-full bg-green-400 pulse-dot"></span>稼働中</span>`
+            :(m.last_push?`<span class="text-[10px] text-yellow-500">⚠ pushなし</span>`:`<span class="text-[10px] text-gray-600">未セットアップ</span>`);
+        const wt=m.working_tool&&m.working_tool!=='-'?m.working_tool:m.working_on;
+        mbc.innerHTML+=`
+        <div class="glass-light rounded-xl p-3.5 glass-hover transition-all flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br ${mc2.bg} flex items-center justify-center text-sm ${mc2.text} font-bold border ${mc2.border} flex-shrink-0">${gsn(m.login).charAt(0).toUpperCase()}</div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2"><span class="text-sm font-medium text-gray-200">${gsn(m.login)}</span>${badge}</div>
+                <p class="text-[11px] text-gray-600 mt-0.5 truncate">${wt!=='-'?wt:''} ${m.commits_today>0?'・'+m.commits_today+'件コミット':''}</p>
+            </div>
+        </div>`});
+
+    // トレンド
+    const ctx=document.getElementById('trend-chart').getContext('2d');
+    if(window.tc)window.tc.destroy();
+    const gradient=ctx.createLinearGradient(0,0,0,300);gradient.addColorStop(0,'rgba(59,130,246,0.15)');gradient.addColorStop(1,'rgba(59,130,246,0)');
+    const gradient2=ctx.createLinearGradient(0,0,0,300);gradient2.addColorStop(0,'rgba(139,92,246,0.15)');gradient2.addColorStop(1,'rgba(139,92,246,0)');
+    window.tc=new Chart(ctx,{type:'line',data:{labels:data.weekly_trend.labels,datasets:[
+        {label:'進捗率 (%)',data:data.weekly_trend.progress,borderColor:'#3b82f6',backgroundColor:gradient,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#3b82f6',borderWidth:2,yAxisID:'y'},
+        {label:'コミット数',data:data.weekly_trend.commits,borderColor:'#8b5cf6',backgroundColor:gradient2,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#8b5cf6',borderWidth:2,yAxisID:'y1'}
+    ]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#6b7280',font:{size:11},boxWidth:12,padding:16}}},scales:{
+        x:{ticks:{color:'#4b5563',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
+        y:{type:'linear',position:'left',title:{display:true,text:'進捗率',color:'#6b7280',font:{size:10}},min:0,max:100,ticks:{color:'#4b5563',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
+        y1:{type:'linear',position:'right',title:{display:true,text:'コミット',color:'#6b7280',font:{size:10}},min:0,ticks:{color:'#4b5563',font:{size:10}},grid:{drawOnChartArea:false}}
+    }}});
+
+    // 直近コミット
+    const cc=document.getElementById('commits-container');cc.innerHTML='';
+    (data.recent_commits||[]).slice(0,8).forEach(c=>{
+        const d=new Date(c.date).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+        const mc2=gmc(c.author);
+        cc.innerHTML+=`
+        <div class="px-4 py-3 flex items-start gap-3 hover:bg-white/[0.02] transition">
+            <div class="w-7 h-7 rounded-full bg-gradient-to-br ${mc2.bg} flex items-center justify-center text-[10px] ${mc2.text} font-bold border ${mc2.border} flex-shrink-0 mt-0.5">${gsn(c.author).charAt(0).toUpperCase()}</div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2"><span class="text-xs font-medium text-gray-300">${gsn(c.author)}</span><span class="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-500">${c.repo}</span><span class="text-[10px] text-gray-700 ml-auto">${d}</span></div>
+                <p class="text-sm text-gray-400 mt-0.5 truncate">${c.message}</p>
+                <span class="text-[10px] text-gray-600">${c.files}files +${c.additions}/-${c.deletions}</span>
+            </div>
+        </div>`});
+}
+
+function toggleDetail(i){const d=document.getElementById('detail-'+i),c=document.getElementById('chevron-'+i);if(!d)return;d.classList.toggle('open');if(c)c.classList.toggle('open')}
+window.addEventListener('DOMContentLoaded',()=>{if(sessionStorage.getItem('authed')==='true')checkAuth()});
+</script>
+</body>
+</html>
