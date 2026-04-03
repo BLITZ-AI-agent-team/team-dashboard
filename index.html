@@ -14,6 +14,12 @@
         .card:hover { transform: translateY(-1px); }
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .task-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .task-detail.open { max-height: 800px; transition: max-height 0.5s ease-in; }
+        .tool-row { cursor: pointer; }
+        .tool-row:hover { background-color: #f9fafb; }
+        .chevron { transition: transform 0.2s; }
+        .chevron.open { transform: rotate(90deg); }
     </style>
     <script>
         tailwind.config = {
@@ -256,33 +262,61 @@ function renderDashboard(data) {
         alertsSection.classList.add('hidden');
     }
 
-    // ③ プロジェクト別
+    // ③ プロジェクト別（クリック展開対応）
     const projContainer = document.getElementById('projects-container');
     projContainer.innerHTML = '';
+    let toolIdx = 0;
     data.projects.forEach(proj => {
         proj.tools.forEach(tool => {
+            const idx = toolIdx++;
             const pct = tool.total > 0 ? Math.round(tool.done / tool.total * 100) : 0;
-            const statusMap = { green: { dot: 'bg-green-500', bar: 'bg-green-500' }, yellow: { dot: 'bg-yellow-500', bar: 'bg-yellow-500' }, red: { dot: 'bg-red-500', bar: 'bg-red-500' }, unknown: { dot: 'bg-gray-400', bar: 'bg-gray-400' } };
+            const statusMap = { green: { dot: 'bg-green-500', bar: 'bg-green-500', label: '順調' }, yellow: { dot: 'bg-yellow-500', bar: 'bg-yellow-500', label: '作業中' }, red: { dot: 'bg-red-500', bar: 'bg-red-500', label: '未着手' }, unknown: { dot: 'bg-gray-400', bar: 'bg-gray-400', label: '未設定' } };
             const s = statusMap[tool.status] || statusMap.unknown;
             const taskLabel = tool.total > 0 ? `${tool.done}/${tool.total}` : 'チェックリスト未追加';
+            const assignee = tool.assignee ? `<span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">👤 ${tool.assignee}</span>` : '';
+            const hasDetail = (tool.remaining_tasks && tool.remaining_tasks.length > 0) || (tool.completed_tasks && tool.completed_tasks.length > 0);
+            const chevron = hasDetail ? `<span class="chevron text-gray-400 text-xs" id="chevron-${idx}">▶</span>` : '';
+
+            let detailHtml = '';
+            if (hasDetail) {
+                let tasks = '';
+                if (tool.remaining_tasks && tool.remaining_tasks.length > 0) {
+                    tasks += `<p class="text-xs font-medium text-gray-500 mb-1">残りタスク (${tool.remaining_tasks.length}件)</p>`;
+                    tool.remaining_tasks.forEach(t => { tasks += `<div class="flex items-start gap-2 py-1"><span class="text-gray-400">☐</span><span class="text-sm text-gray-700">${t}</span></div>`; });
+                }
+                if (tool.completed_tasks && tool.completed_tasks.length > 0) {
+                    tasks += `<p class="text-xs font-medium text-gray-500 mt-3 mb-1">完了済み (${tool.completed_tasks.length}件)</p>`;
+                    tool.completed_tasks.forEach(t => { tasks += `<div class="flex items-start gap-2 py-1"><span class="text-green-500">✓</span><span class="text-sm text-gray-400 line-through">${t}</span></div>`; });
+                }
+                detailHtml = `<div class="task-detail" id="detail-${idx}"><div class="pt-3 mt-3 border-t border-gray-100 px-1">${tasks}</div></div>`;
+            }
+
             projContainer.innerHTML += `
-                <div class="card bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center gap-4">
-                    <div class="w-3 h-3 rounded-full ${s.dot} flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-900 truncate">${tool.name}</span>
-                            <span class="text-xs text-gray-500 ml-2 flex-shrink-0">${taskLabel}</span>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="tool-row p-4 flex items-center gap-4" onclick="toggleDetail(${idx})">
+                        ${chevron}
+                        <div class="w-3 h-3 rounded-full ${s.dot} flex-shrink-0"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="text-sm font-medium text-gray-900">${tool.name}</span>
+                                ${assignee}
+                                <span class="text-xs text-gray-400">${s.label}</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                    <div class="progress-bar ${s.bar} h-2 rounded-full" style="width:${pct}%"></div>
+                                </div>
+                                <span class="text-xs text-gray-500 flex-shrink-0">${taskLabel}</span>
+                            </div>
                         </div>
-                        <div class="bg-gray-200 rounded-full h-2">
-                            <div class="progress-bar ${s.bar} h-2 rounded-full" style="width:${pct}%"></div>
-                        </div>
+                        <span class="text-sm font-bold text-gray-700 w-12 text-right">${tool.total > 0 ? pct + '%' : '-'}</span>
                     </div>
-                    <span class="text-sm font-bold text-gray-700 w-12 text-right">${tool.total > 0 ? pct + '%' : '-'}</span>
+                    ${detailHtml}
                 </div>`;
         });
     });
 
-    // ④ メンバー別
+    // ④ メンバー別（担当ツール表示対応）
     const membersContainer = document.getElementById('members-container');
     membersContainer.innerHTML = '';
     data.members.forEach(m => {
@@ -292,6 +326,10 @@ function renderDashboard(data) {
             ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">稼働中</span>'
             : (m.last_push ? '<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">⚠️ pushなし</span>' : '<span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full">未セットアップ</span>');
         const lastPush = m.last_push ? m.last_push : '-';
+        const workingTool = m.working_tool && m.working_tool !== '-' ? m.working_tool : '';
+        const workingInfo = workingTool
+            ? `<div>作業中: <span class="font-medium text-gray-700">${workingTool}</span> <span class="text-gray-400">(${m.working_on})</span></div>`
+            : `<div>作業中: ${m.working_on}</div>`;
         membersContainer.innerHTML += `
             <div class="card bg-white rounded-xl shadow-sm border ${borderColor} p-4">
                 <div class="flex items-center justify-between mb-2">
@@ -301,7 +339,7 @@ function renderDashboard(data) {
                 <div class="text-xs text-gray-500 space-y-1">
                     <div>最終push: ${lastPush}</div>
                     <div>本日コミット: ${m.commits_today}件</div>
-                    <div>作業中: ${m.working_on}</div>
+                    ${workingInfo}
                 </div>
             </div>`;
     });
@@ -346,6 +384,15 @@ function renderDashboard(data) {
                 </div>
             </div>`;
     });
+}
+
+// === ツール詳細の展開/折りたたみ ===
+function toggleDetail(idx) {
+    const detail = document.getElementById('detail-' + idx);
+    const chevron = document.getElementById('chevron-' + idx);
+    if (!detail) return;
+    detail.classList.toggle('open');
+    if (chevron) chevron.classList.toggle('open');
 }
 
 // 初期化

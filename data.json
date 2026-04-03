@@ -1,16 +1,383 @@
 {
-    "generated_at": "2026-04-03T02:20:13Z",
-    "team_health": "red",
-    "total_progress": { "done": 5, "total": 24, "percent": 20 },
-    "active_members": { "active": 0, "total": 4 },
-    "recent_commit_count": 3,
-    "alerts": [{"type":"warning","message":"4名が直近2日間pushしていません"}],
-    "projects": [{"name":"blitz-ad","tools":[{"name":"広告KPI共通分析モジュール","file":"00_kpi_analyzer.md","done":0,"total":0,"status":"unknown"},{"name":"Meta広告操作エージェントモジュール","file":"00_meta_agent.md","done":0,"total":0,"status":"unknown"},{"name":"動画検索・分析モジュール","file":"00_video_finder.md","done":0,"total":0,"status":"unknown"},{"name":"VPSログイン＆アカウントログインモジュール","file":"00_vps_login.md","done":0,"total":0,"status":"unknown"},{"name":"Meta定期巡回モジュール","file":"01_meta_patrol.md","done":0,"total":0,"status":"unknown"},{"name":"予実シート自動化","file":"02_yojitsu_auto.md","done":5,"total":15,"status":"yellow"},{"name":"広告運用 予実AI診断・方針決定システム","file":"03_yojitsu_spec.md","done":0,"total":0,"status":"unknown"},{"name":"Meta広告設定変更ツール","file":"04_requirements.md","done":0,"total":0,"status":"unknown"},{"name":"MTG議事録自動生成ツール","file":"05_mtg_minutes.md","done":0,"total":0,"status":"unknown"},{"name":"LP複製・アップロード","file":"09_lp_deploy.md","done":0,"total":9,"status":"red"},{"name":"Meta広告 領収書取得・照合自動化モジュール","file":"10_receipt_auto.md","done":0,"total":0,"status":"unknown"},{"name":"業務指示書 日次シート自動作成","file":"11_daily_report_auto.md","done":0,"total":0,"status":"unknown"}]}],
-    "members": [{"login":"kawasumi-shuhei-pixel","display":"kawasumi-shuhei-pixel","last_push":null,"commits_today":0,"status":"inactive","working_on":"-"},{"login":"takahashi-saika-maker","display":"takahashi-saika-maker","last_push":null,"commits_today":0,"status":"inactive","working_on":"-"},{"login":"uda-tatsuya-create","display":"uda-tatsuya-create","last_push":null,"commits_today":0,"status":"inactive","working_on":"-"},{"login":"yamamoto-kosuke-ai","display":"yamamoto-kosuke-ai","last_push":null,"commits_today":0,"status":"inactive","working_on":"-"}],
-    "recent_commits": [{"author":"kawasumishuhei0117","repo":"blitz-ad","message":"02: E列書き込みをset_acctに修正 + 新規CPS見出しCENTER配置 + 不要ファイル・テストドメイン削除","date":"2026-04-02T09:40:44Z","files":300,"additions":4,"deletions":17752},{"author":"kawasumishuhei0117","repo":"blitz-ad","message":"初回コミット","date":"2026-04-02T06:36:07Z","files":300,"additions":44212,"deletions":109},{"author":"kawasumishuhei0117","repo":"blitz-ad","message":"02: Phase 2先頭でB列マージ解除 + s_set依存B列書き込み","date":"2026-04-02T00:26:24Z","files":1,"additions":12,"deletions":9}],
-    "weekly_trend": {
-        "labels": ["6d前","5d前","4d前","3d前","2d前","昨日","今日"],
-        "progress": [20,20,20,20,20,20,20],
-        "commits": [0,0,0,0,0,0,3]
+  "generated_at": "2026-04-03T02:43:41Z",
+  "team_health": "red",
+  "total_progress": {
+    "done": 5,
+    "total": 116,
+    "percent": 4
+  },
+  "active_members": {
+    "active": 0,
+    "total": 4
+  },
+  "recent_commit_count": 4,
+  "alerts": [
+    {
+      "type": "warning",
+      "message": "4名が直近2日間pushしていません"
+    },
+    {
+      "type": "error",
+      "message": "CRM System v2.0 -: 92件のタスクが全て未着手です"
+    },
+    {
+      "type": "error",
+      "message": "LP複製・アップロード: 9件のタスクが全て未着手です"
     }
+  ],
+  "projects": [
+    {
+      "name": "crm_analysis",
+      "tools": [
+        {
+          "name": "CRM System v2.0 -",
+          "file": "REQUIREMENTS.md",
+          "done": 0,
+          "total": 92,
+          "status": "red",
+          "assignee": null,
+          "remaining_tasks": [
+            "Supabase Auth導入（メール/パスワード認証）",
+            "ロールベースアクセス制御（RBAC: 管理者/マネージャー/営業/CS）",
+            "セッション管理（JWT + リフレッシュトークン）",
+            "2FA（二要素認証）オプション",
+            "APIキー認証（n8n webhook保護）",
+            "CSRF/XSS対策強化",
+            "Supabase PostgreSQL へのデータ移行",
+            "リレーショナルスキーマ設計（正規化）",
+            "Row Level Security (RLS) 設定",
+            "インデックス最適化",
+            "データバックアップ自動化",
+            "Supabase Realtime でデータ変更通知",
+            "WebSocket によるリアルタイムダッシュボード更新",
+            "チーム間コラボレーション（同時編集検知）",
+            "LINEメッセージのリアルタイム受信通知",
+            "ブラウザPush通知（Service Worker）",
+            "モバイルレスポンシブ完全対応",
+            "ダークモード",
+            "ページネーション + 仮想スクロール（大量データ対応）",
+            "キーボードショートカット"
+          ],
+          "completed_tasks": []
+        },
+        {
+          "name": "CRM System v2.1 - 売上照合 + セキュリティ強化",
+          "file": "REQUIREMENTS_v2.1_payment_matching.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "CRM System v2.2 - 顧客管理モジュール",
+          "file": "REQUIREMENTS_v2.2_customer_management.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "CRM System v2.3 -",
+          "file": "REQUIREMENTS_v2.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "CRM System v3.0 -",
+          "file": "REQUIREMENTS_v3.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        }
+      ]
+    },
+    {
+      "name": "blitz-ad",
+      "tools": [
+        {
+          "name": "広告KPI共通分析モジュール",
+          "file": "00_kpi_analyzer.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "Meta広告操作エージェントモジュール",
+          "file": "00_meta_agent.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "動画検索・分析モジュール",
+          "file": "00_video_finder.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "VPSログイン＆アカウントログインモジュール",
+          "file": "00_vps_login.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "Meta定期巡回モジュール",
+          "file": "01_meta_patrol.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "予実シート自動化",
+          "file": "02_yojitsu_auto.md",
+          "done": 5,
+          "total": 15,
+          "status": "yellow",
+          "assignee": "kawasumishuhei0117",
+          "remaining_tasks": [
+            "新タブ作成 + 日程更新機能",
+            "新CP検出 + 行追加機能（設定シート比較）",
+            "削除CP処理（グレーアウト → 次回削除）",
+            "設定変更の反映",
+            "IMPORTRANGE数式の自動設定（結果数・結果単価・フリークエンシー）",
+            "ダブルチェック機能（マスターシート直接照合 + 整合性チェック）",
+            "テスト環境のシートで動作確認（3案件すべて）",
+            "数値がAds Managerと一致することを確認",
+            "本番シートIDに切り替え",
+            "運用担当者への実行手順共有"
+          ],
+          "completed_tasks": [
+            "`results`ハンドラ追加（complete_registrationから取得）",
+            "`frequency` / `cost_per_result` 自動計算追加",
+            "ヘッダー行更新",
+            "テスト環境で検証済み（7プロ rows 8,9）",
+            "本番適用手順を `02_master_data_update_guide.md` に記載"
+          ]
+        },
+        {
+          "name": "広告運用 予実AI診断・方針決定システム",
+          "file": "03_yojitsu_spec.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "Meta広告設定変更ツール",
+          "file": "04_requirements.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "MTG議事録自動生成ツール",
+          "file": "05_mtg_minutes.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "LP複製・アップロード",
+          "file": "09_lp_deploy.md",
+          "done": 0,
+          "total": 9,
+          "status": "red",
+          "assignee": null,
+          "remaining_tasks": [
+            "FileZillaの「既存ファイルを上書きする場合は確認する」設定がONになっているか確認",
+            "サーバーの現状をスクリーンショットで記録（作業前の状態を保存）",
+            "アップロード先のドメイン・ディレクトリを声に出して確認",
+            "今回使用するドメインを確認し、実行者に伝える",
+            "6つのフォルダ名を決めて実行者に伝える",
+            "LPデータフォルダ（zip等）を実行者に渡す",
+            "FileZillaの接続情報（ホスト・ユーザー名・パスワード・ポート）を実行者に渡す ★",
+            "広告運用レポートのURL・記入箇所を確認し、実行者に伝える ★",
+            "FileZillaの上書き確認設定がONになっているか実行者に確認させる"
+          ],
+          "completed_tasks": []
+        },
+        {
+          "name": "Meta広告 領収書取得・照合自動化モジュール",
+          "file": "10_receipt_auto.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        },
+        {
+          "name": "業務指示書 日次シート自動作成",
+          "file": "11_daily_report_auto.md",
+          "done": 0,
+          "total": 0,
+          "status": "unknown",
+          "assignee": null,
+          "remaining_tasks": [],
+          "completed_tasks": []
+        }
+      ]
+    }
+  ],
+  "members": [
+    {
+      "login": "kawasumi-shuhei-pixel",
+      "display": "kawasumi-shuhei-pixel",
+      "last_push": "[]",
+      "commits_today": 0,
+      "status": "warning",
+      "working_on": "crm_analysis",
+      "working_tool": "-"
+    },
+    {
+      "login": "takahashi-saika-maker",
+      "display": "takahashi-saika-maker",
+      "last_push": "[]",
+      "commits_today": 0,
+      "status": "warning",
+      "working_on": "crm_analysis",
+      "working_tool": "-"
+    },
+    {
+      "login": "uda-tatsuya-create",
+      "display": "uda-tatsuya-create",
+      "last_push": "[]",
+      "commits_today": 0,
+      "status": "warning",
+      "working_on": "crm_analysis",
+      "working_tool": "-"
+    },
+    {
+      "login": "yamamoto-kosuke-ai",
+      "display": "yamamoto-kosuke-ai",
+      "last_push": "[]",
+      "commits_today": 0,
+      "status": "warning",
+      "working_on": "crm_analysis",
+      "working_tool": "-"
+    }
+  ],
+  "recent_commits": [
+    {
+      "author": {
+        "login": "takahashi-saika-maker",
+        "id": 264969388,
+        "node_id": "U_kgDOD8scrA",
+        "avatar_url": "https://avatars.githubusercontent.com/u/264969388?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/takahashi-saika-maker",
+        "html_url": "https://github.com/takahashi-saika-maker",
+        "followers_url": "https://api.github.com/users/takahashi-saika-maker/followers",
+        "following_url": "https://api.github.com/users/takahashi-saika-maker/following{/other_user}",
+        "gists_url": "https://api.github.com/users/takahashi-saika-maker/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/takahashi-saika-maker/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/takahashi-saika-maker/subscriptions",
+        "organizations_url": "https://api.github.com/users/takahashi-saika-maker/orgs",
+        "repos_url": "https://api.github.com/users/takahashi-saika-maker/repos",
+        "events_url": "https://api.github.com/users/takahashi-saika-maker/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/takahashi-saika-maker/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": "crm_analysis",
+      "message": "",
+      "date": "",
+      "files": 37,
+      "additions": 37720,
+      "deletions": 159
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "blitz-ad",
+      "message": "02: E列書き込みをset_acctに修正 + 新規CPS見出しCENTER配置 + 不要ファイル・テストドメイン削除",
+      "date": "2026-04-02T09:40:44Z",
+      "files": 300,
+      "additions": 4,
+      "deletions": 17752
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "blitz-ad",
+      "message": "初回コミット",
+      "date": "2026-04-02T06:36:07Z",
+      "files": 300,
+      "additions": 44212,
+      "deletions": 109
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "blitz-ad",
+      "message": "02: Phase 2先頭でB列マージ解除 + s_set依存B列書き込み",
+      "date": "2026-04-02T00:26:24Z",
+      "files": 1,
+      "additions": 12,
+      "deletions": 9
+    }
+  ],
+  "weekly_trend": {
+    "labels": [
+      "03-28",
+      "03-29",
+      "03-30",
+      "03-31",
+      "04-01",
+      "04-02",
+      "04-03"
+    ],
+    "progress": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      4
+    ],
+    "commits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      4
+    ]
+  }
 }
