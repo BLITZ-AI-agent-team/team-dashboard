@@ -1,0 +1,23 @@
+name: Trigger on Member Push
+
+# Organization内の他リポジトリにこのワークフローを配置すると
+# push時にダッシュボードを自動更新する
+# 使い方: このファイルを各メンバーリポジトリの .github/workflows/ にコピー
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  notify-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger dashboard update
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/BLITZ-AI-agent-team/team-dashboard/dispatches \
+            -X POST \
+            -f event_type=member-push \
+            -f client_payload='{"repo":"${{ github.repository }}","pusher":"${{ github.actor }}"}' \
+            2>/dev/null || echo "Dashboard trigger skipped (no permission)"

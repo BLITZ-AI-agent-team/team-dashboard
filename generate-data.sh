@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================
-# ダッシュボード用データ生成スクリプト
-# GitHub APIからデータを取得してdata.jsonを生成
+# ダッシュボード用データ生成スクリプト v2
+# 担当者紐づけ・Issue詳細・トレンド対応
 # ============================================
 
 set -euo pipefail
@@ -9,188 +9,301 @@ set -euo pipefail
 ORG="BLITZ-AI-agent-team"
 OUTPUT_DIR="${1:-docs}"
 OUTPUT_FILE="$OUTPUT_DIR/data.json"
+HISTORY_DIR="$OUTPUT_DIR/data-history"
 TODAY=$(date -u +%Y-%m-%d)
 YESTERDAY=$(date -u -d "yesterday" +%Y-%m-%d 2>/dev/null || date -u -v-1d +%Y-%m-%d 2>/dev/null || date -u +%Y-%m-%d)
 
-echo "📊 ダッシュボードデータ生成"
+echo "📊 ダッシュボードデータ生成 v2"
 echo "Organization: $ORG"
 echo "Date: $TODAY"
 
-# リポジトリ一覧
+mkdir -p "$HISTORY_DIR"
+
 REPOS=$(gh repo list "$ORG" --json name --limit 100 -q '.[].name' 2>/dev/null | grep -v "team-dashboard" || echo "")
 MEMBERS=$(gh api "orgs/$ORG/members" --jq '.[].login' 2>/dev/null || echo "")
 
-# プロジェクトデータ収集
-PROJECTS_JSON="["
 TOTAL_DONE=0
 TOTAL_TASKS=0
 TOTAL_COMMITS=0
 ACTIVE_COUNT=0
 MEMBER_COUNT=$(echo "$MEMBERS" | grep -c . 2>/dev/null || echo "0")
-ALERTS_JSON="["
-RECENT_COMMITS_JSON="["
-MEMBERS_JSON="["
 
-for REPO in $REPOS; do
-    FULL_REPO="$ORG/$REPO"
-    TOOLS_JSON="["
+# === Python でJSON生成（堅牢なエスケープ処理）===
+python3 << 'PYEOF'
+import subprocess, json, sys, os, glob, re, base64, io
+from datetime import datetime, timedelta, timezone
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-    # 全mdファイルを取得（要件定義書候補）
-    ALL_MD=$(gh api "repos/$FULL_REPO/git/trees/HEAD?recursive=1" \
-        --jq '.tree[] | select(.type=="blob") | .path' 2>/dev/null \
-        | grep '\.md$' | grep -v '_guide\.' | grep -v 'MTG' | grep -v 'session_handoff' | grep -v 'user_tasks' \
-        || echo "")
+ORG = "BLITZ-AI-agent-team"
+OUTPUT_DIR = sys.argv[1] if len(sys.argv) > 1 else "docs"
+OUTPUT_FILE = f"{OUTPUT_DIR}/data.json"
+HISTORY_DIR = f"{OUTPUT_DIR}/data-history"
+TODAY = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    for FILE in $ALL_MD; do
-        CONTENT=$(gh api "repos/$FULL_REPO/contents/$FILE" --jq '.content' 2>/dev/null | base64 -d 2>/dev/null || echo "")
-        [ -z "$CONTENT" ] && continue
+def gh(cmd):
+    try:
+        r = subprocess.run(f"gh {cmd}", shell=True, capture_output=True, text=True, timeout=30, encoding='utf-8', errors='replace')
+        return r.stdout.strip()
+    except:
+        return ""
 
-        TITLE=$(echo "$CONTENT" | head -1 | sed 's/^# //')
-        # 要件定義書/仕様書のみ対象
-        IS_REQ=$(echo "$TITLE" | grep -ciE '要件定義書|仕様書|requirements' || true)
-        [ "$IS_REQ" -eq 0 ] && continue
+def gh_json(cmd):
+    out = gh(cmd)
+    try:
+        return json.loads(out) if out else []
+    except:
+        return []
 
-        UNCHECKED=$(echo "$CONTENT" | grep -cE '^\s*- \[ \]' || true)
-        CHECKED=$(echo "$CONTENT" | grep -cE '^\s*- \[x\]' || true)
-        TOOL_TOTAL=$((UNCHECKED + CHECKED))
-        TOOL_DONE=$CHECKED
-        TOTAL_DONE=$((TOTAL_DONE + TOOL_DONE))
-        TOTAL_TASKS=$((TOTAL_TASKS + TOOL_TOTAL))
+# リポジトリ・メンバー一覧
+repos = [r["name"] for r in gh_json(f'repo list {ORG} --json name --limit 100') if r["name"] != "team-dashboard"]
+members_list = gh_json(f'api orgs/{ORG}/members --jq "[.[].login]"')
+if isinstance(members_list, str):
+    members_list = json.loads(members_list) if members_list else []
 
-        # ステータス判定
-        if [ "$TOOL_TOTAL" -eq 0 ]; then
-            STATUS="unknown"
-        elif [ "$TOOL_DONE" -eq "$TOOL_TOTAL" ]; then
-            STATUS="green"
-        elif [ "$TOOL_DONE" -gt 0 ]; then
-            STATUS="yellow"
-        else
-            STATUS="red"
-        fi
+print(f"Repos: {repos}")
+print(f"Members: {members_list}")
 
-        # ツール名をクリーンアップ
-        CLEAN_NAME=$(echo "$TITLE" | sed 's/ 要件定義書.*//; s/ 仕様書.*//')
+# === プロジェクトデータ収集 ===
+projects = []
+total_done = 0
+total_tasks = 0
+total_commits = 0
+all_alerts = []
+all_recent_commits = []
 
-        TOOLS_JSON="$TOOLS_JSON{\"name\":\"$CLEAN_NAME\",\"file\":\"$FILE\",\"done\":$TOOL_DONE,\"total\":$TOOL_TOTAL,\"status\":\"$STATUS\"},"
-    done
+for repo in repos:
+    full = f"{ORG}/{repo}"
+    tools = []
 
-    TOOLS_JSON="${TOOLS_JSON%,}]"
-    PROJECTS_JSON="$PROJECTS_JSON{\"name\":\"$REPO\",\"tools\":$TOOLS_JSON},"
+    # ファイル一覧取得
+    tree = gh_json(f'api repos/{full}/git/trees/HEAD?recursive=1 --jq "[.tree[] | select(.type==\\"blob\\") | .path]"')
+    if isinstance(tree, str):
+        tree = json.loads(tree) if tree else []
+    md_files = [f for f in tree if f.endswith('.md') and '_guide.' not in f and 'MTG' not in f and 'session_handoff' not in f and 'user_tasks' not in f]
 
-    # コミット取得
-    COMMITS=$(gh api "repos/$FULL_REPO/commits?since=${YESTERDAY}T00:00:00Z&per_page=20" \
-        --jq '.[] | {sha: .sha[0:7], author: (.author.login // .commit.author.name), message: (.commit.message | split("\n")[0]), date: .commit.author.date}' 2>/dev/null || echo "")
+    # コミットメッセージから担当者×ツール紐づけを構築
+    # コミットメッセージの先頭番号(例: "02: ...")からツールファイルを推定
+    recent_commits_raw = gh_json(f'api repos/{full}/commits?since={TODAY}T00:00:00Z&per_page=30 --jq "[.[] | {{sha: .sha, author: (.author.login // .commit.author.name), message: (.commit.message | split(\\"\\n\\")[0]), date: .commit.author.date, files_url: .url}}]"')
+    if isinstance(recent_commits_raw, str):
+        recent_commits_raw = json.loads(recent_commits_raw) if recent_commits_raw else []
 
-    COMMIT_COUNT=$(echo "$COMMITS" | grep -c '"sha"' 2>/dev/null || echo "0")
-    TOTAL_COMMITS=$((TOTAL_COMMITS + COMMIT_COUNT))
+    # 昨日分も取得
+    yesterday_commits = gh_json(f'api "repos/{full}/commits?since={(datetime.now(timezone.utc)-timedelta(days=1)).strftime("%Y-%m-%d")}T00:00:00Z&until={TODAY}T00:00:00Z&per_page=30" --jq "[.[] | {{sha: .sha, author: (.author.login // .commit.author.name), message: (.commit.message | split(\\"\\n\\")[0]), date: .commit.author.date}}]"')
+    if isinstance(yesterday_commits, str):
+        yesterday_commits = json.loads(yesterday_commits) if yesterday_commits else []
 
-    # 各コミットの詳細
-    COMMIT_SHAS=$(gh api "repos/$FULL_REPO/commits?since=${YESTERDAY}T00:00:00Z&per_page=10" --jq '.[].sha' 2>/dev/null || echo "")
-    for SHA in $COMMIT_SHAS; do
-        DETAIL=$(gh api "repos/$FULL_REPO/commits/$SHA" --jq '{author: (.author.login // .commit.author.name), message: (.commit.message | split("\n")[0]), date: .commit.author.date, files: (.files | length), additions: .stats.additions, deletions: .stats.deletions}' 2>/dev/null || echo "")
-        if [ -n "$DETAIL" ]; then
-            AUTHOR=$(echo "$DETAIL" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['author'])" 2>/dev/null || echo "unknown")
-            MSG=$(echo "$DETAIL" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['message'])" 2>/dev/null || echo "")
-            DATE=$(echo "$DETAIL" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['date'])" 2>/dev/null || echo "")
-            FILES=$(echo "$DETAIL" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['files'])" 2>/dev/null || echo "0")
-            ADDS=$(echo "$DETAIL" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['additions'])" 2>/dev/null || echo "0")
-            DELS=$(echo "$DETAIL" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['deletions'])" 2>/dev/null || echo "0")
-            # Escape quotes in message
-            MSG=$(echo "$MSG" | sed 's/"/\\"/g')
-            RECENT_COMMITS_JSON="$RECENT_COMMITS_JSON{\"author\":\"$AUTHOR\",\"repo\":\"$REPO\",\"message\":\"$MSG\",\"date\":\"$DATE\",\"files\":$FILES,\"additions\":$ADDS,\"deletions\":$DELS},"
-        fi
-    done
-done
+    all_commits = recent_commits_raw + yesterday_commits
+    total_commits += len(all_commits)
 
-PROJECTS_JSON="${PROJECTS_JSON%,}]"
-RECENT_COMMITS_JSON="${RECENT_COMMITS_JSON%,}]"
+    # 担当者マッピング: ファイル番号プレフィクス → 最新コミットの著者
+    tool_assignees = {}
+    for c in all_commits:
+        msg = c.get("message", "")
+        author = c.get("author", "unknown")
+        # "02: xxx" パターンからツール番号を抽出
+        m = re.match(r'^(\d{2})[:：\s]', msg)
+        if m:
+            prefix = m.group(1)
+            if prefix not in tool_assignees:
+                tool_assignees[prefix] = author
 
-# 全体進捗率
-if [ "$TOTAL_TASKS" -gt 0 ]; then
-    TOTAL_PCT=$((TOTAL_DONE * 100 / TOTAL_TASKS))
-else
-    TOTAL_PCT=0
-fi
+    # コミット詳細を収集
+    for c in all_commits[:10]:  # 直近10件
+        sha = c.get("sha", "")
+        if not sha:
+            continue
+        detail = gh_json(f'api repos/{full}/commits/{sha} --jq "{{files: (.files | length), additions: .stats.additions, deletions: .stats.deletions}}"')
+        if isinstance(detail, str):
+            detail = json.loads(detail) if detail else {}
+        all_recent_commits.append({
+            "author": c.get("author", "unknown"),
+            "repo": repo,
+            "message": c.get("message", ""),
+            "date": c.get("date", ""),
+            "files": detail.get("files", 0) if isinstance(detail, dict) else 0,
+            "additions": detail.get("additions", 0) if isinstance(detail, dict) else 0,
+            "deletions": detail.get("deletions", 0) if isinstance(detail, dict) else 0
+        })
 
-# メンバー別データ
-for MEMBER in $MEMBERS; do
-    MEMBER_COMMITS=0
-    LAST_PUSH=""
-    WORKING_ON="-"
+    # 各要件定義書を解析
+    for f in md_files:
+        content_b64 = gh(f'api repos/{full}/contents/{f} --jq .content')
+        if not content_b64:
+            continue
+        try:
+            content = base64.b64decode(content_b64).decode('utf-8')
+        except:
+            continue
 
-    for REPO in $REPOS; do
-        COUNT=$(gh api "repos/$ORG/$REPO/commits?author=$MEMBER&since=${YESTERDAY}T00:00:00Z" --jq 'length' 2>/dev/null || echo "0")
-        MEMBER_COMMITS=$((MEMBER_COMMITS + COUNT))
-        if [ "$COUNT" -gt 0 ]; then
-            WORKING_ON="$REPO"
-            LAST_PUSH="$TODAY"
-        fi
-    done
+        title = content.split('\n')[0].lstrip('# ').strip()
+        is_req = any(kw in title for kw in ['要件定義書', '仕様書', 'requirements', 'Requirements'])
+        if not is_req:
+            continue
 
-    # 最終push日（直近が今日でなければ過去を探す）
-    if [ -z "$LAST_PUSH" ]; then
-        for REPO in $REPOS; do
-            LP=$(gh api "repos/$ORG/$REPO/commits?author=$MEMBER&per_page=1" --jq '.[0].commit.author.date // empty' 2>/dev/null || echo "")
-            if [ -n "$LP" ]; then
-                LAST_PUSH=$(echo "$LP" | cut -dT -f1)
-                WORKING_ON="$REPO"
+        # チェックリスト抽出
+        unchecked = [l.strip().lstrip('- [ ] ') for l in content.split('\n') if re.match(r'^\s*- \[ \]', l)]
+        checked = [l.strip().lstrip('- [x] ') for l in content.split('\n') if re.match(r'^\s*- \[x\]', l)]
+        tool_total = len(unchecked) + len(checked)
+        tool_done = len(checked)
+        total_done += tool_done
+        total_tasks += tool_total
+
+        # ステータス
+        if tool_total == 0:
+            status = "unknown"
+        elif tool_done == tool_total:
+            status = "green"
+        elif tool_done > 0:
+            status = "yellow"
+        else:
+            status = "red"
+
+        # ツール名
+        clean_name = re.sub(r'\s*(要件定義書|仕様書).*$', '', title)
+
+        # ファイル番号プレフィクスから担当者を取得
+        file_prefix = re.match(r'^(\d{2})_', f)
+        assignee = None
+        if file_prefix:
+            assignee = tool_assignees.get(file_prefix.group(1))
+
+        # 残タスク詳細
+        remaining_tasks = unchecked[:20]  # 最大20件
+
+        tools.append({
+            "name": clean_name,
+            "file": f,
+            "done": tool_done,
+            "total": tool_total,
+            "status": status,
+            "assignee": assignee,
+            "remaining_tasks": remaining_tasks,
+            "completed_tasks": checked[:10]
+        })
+
+    projects.append({"name": repo, "tools": tools})
+
+# === メンバー別データ ===
+members_data = []
+active_count = 0
+for member in members_list:
+    member_commits = 0
+    last_push = None
+    working_on = "-"
+    working_tool = "-"
+
+    for repo in repos:
+        count_str = gh(f'api repos/{ORG}/{repo}/commits?author={member}&since={(datetime.now(timezone.utc)-timedelta(days=1)).strftime("%Y-%m-%d")}T00:00:00Z --jq length')
+        count = int(count_str) if count_str.isdigit() else 0
+        member_commits += count
+        if count > 0:
+            working_on = repo
+            last_push = TODAY
+            # 最新コミットメッセージからツール特定
+            last_msg = gh(f'api repos/{ORG}/{repo}/commits?author={member}&per_page=1 --jq ".[0].commit.message | split(\\"\\n\\")[0]"')
+            m = re.match(r'^(\d{2})[:：\s]', last_msg)
+            if m:
+                prefix = m.group(1)
+                for proj in projects:
+                    for t in proj.get("tools", []):
+                        if t["file"].startswith(prefix + "_"):
+                            working_tool = t["name"]
+                            break
+
+    if not last_push:
+        for repo in repos:
+            lp = gh(f'api repos/{ORG}/{repo}/commits?author={member}&per_page=1 --jq ".[0].commit.author.date // empty"')
+            if lp:
+                last_push = lp[:10]
+                working_on = repo
                 break
-            fi
-        done
-    fi
 
-    # ステータス判定
-    if [ "$MEMBER_COMMITS" -gt 0 ]; then
-        M_STATUS="active"
-        ACTIVE_COUNT=$((ACTIVE_COUNT + 1))
-    elif [ -n "$LAST_PUSH" ]; then
-        M_STATUS="warning"
-    else
-        M_STATUS="inactive"
-    fi
+    if member_commits > 0:
+        m_status = "active"
+        active_count += 1
+    elif last_push:
+        m_status = "warning"
+    else:
+        m_status = "inactive"
 
-    LP_JSON="null"
-    [ -n "$LAST_PUSH" ] && LP_JSON="\"$LAST_PUSH\""
+    members_data.append({
+        "login": member,
+        "display": member,
+        "last_push": last_push,
+        "commits_today": member_commits,
+        "status": m_status,
+        "working_on": working_on,
+        "working_tool": working_tool
+    })
 
-    MEMBERS_JSON="$MEMBERS_JSON{\"login\":\"$MEMBER\",\"display\":\"$MEMBER\",\"last_push\":$LP_JSON,\"commits_today\":$MEMBER_COMMITS,\"status\":\"$M_STATUS\",\"working_on\":\"$WORKING_ON\"},"
-done
+# === アラート ===
+inactive_count = len(members_list) - active_count
+if inactive_count > 0:
+    all_alerts.append({"type": "warning", "message": f"{inactive_count}名が直近2日間pushしていません"})
 
-MEMBERS_JSON="${MEMBERS_JSON%,}]"
+# 停滞ツール検知（チェックリストがあるのに進捗0%）
+for proj in projects:
+    for t in proj.get("tools", []):
+        if t["status"] == "red" and t["total"] > 0:
+            all_alerts.append({"type": "error", "message": f"{t['name']}: {t['total']}件のタスクが全て未着手です"})
 
-# アラート生成
-INACTIVE_COUNT=$((MEMBER_COUNT - ACTIVE_COUNT))
-if [ "$INACTIVE_COUNT" -gt 0 ]; then
-    ALERTS_JSON="$ALERTS_JSON{\"type\":\"warning\",\"message\":\"${INACTIVE_COUNT}名が直近2日間pushしていません\"},"
-fi
-ALERTS_JSON="${ALERTS_JSON%,}]"
+# === チーム全体ヘルス ===
+total_pct = (total_done * 100 // total_tasks) if total_tasks > 0 else 0
+if active_count >= (len(members_list) // 2 + 1) and len([a for a in all_alerts if a["type"] == "error"]) == 0:
+    team_health = "green"
+elif active_count >= 1:
+    team_health = "yellow"
+else:
+    team_health = "red"
 
-# チーム全体ヘルス
-if [ "$ACTIVE_COUNT" -ge "$((MEMBER_COUNT / 2 + 1))" ] && [ "$TOTAL_PCT" -ge 0 ]; then
-    TEAM_HEALTH="green"
-elif [ "$ACTIVE_COUNT" -ge 1 ]; then
-    TEAM_HEALTH="yellow"
-else
-    TEAM_HEALTH="red"
-fi
+# === 週次トレンド（過去7日分のhistoryから） ===
+trend_labels = []
+trend_progress = []
+trend_commits = []
+for i in range(6, -1, -1):
+    d = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+    trend_labels.append(d[5:])  # MM-DD
+    hist_file = f"{HISTORY_DIR}/{d}.json"
+    if os.path.exists(hist_file):
+        try:
+            with open(hist_file) as hf:
+                hdata = json.load(hf)
+                trend_progress.append(hdata.get("total_progress", {}).get("percent", 0))
+                trend_commits.append(hdata.get("recent_commit_count", 0))
+        except:
+            trend_progress.append(0)
+            trend_commits.append(0)
+    else:
+        # 今日のデータ
+        if i == 0:
+            trend_progress.append(total_pct)
+            trend_commits.append(total_commits)
+        else:
+            trend_progress.append(0)
+            trend_commits.append(0)
 
-# JSON出力
-cat > "$OUTPUT_FILE" << JSONEOF
-{
-    "generated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-    "team_health": "$TEAM_HEALTH",
-    "total_progress": { "done": $TOTAL_DONE, "total": $TOTAL_TASKS, "percent": $TOTAL_PCT },
-    "active_members": { "active": $ACTIVE_COUNT, "total": $MEMBER_COUNT },
-    "recent_commit_count": $TOTAL_COMMITS,
-    "alerts": $ALERTS_JSON,
-    "projects": $PROJECTS_JSON,
-    "members": $MEMBERS_JSON,
-    "recent_commits": $RECENT_COMMITS_JSON,
+# === JSON出力 ===
+output = {
+    "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "team_health": team_health,
+    "total_progress": {"done": total_done, "total": total_tasks, "percent": total_pct},
+    "active_members": {"active": active_count, "total": len(members_list)},
+    "recent_commit_count": total_commits,
+    "alerts": all_alerts,
+    "projects": projects,
+    "members": members_data,
+    "recent_commits": all_recent_commits[:15],
     "weekly_trend": {
-        "labels": ["6d前","5d前","4d前","3d前","2d前","昨日","今日"],
-        "progress": [$TOTAL_PCT,$TOTAL_PCT,$TOTAL_PCT,$TOTAL_PCT,$TOTAL_PCT,$TOTAL_PCT,$TOTAL_PCT],
-        "commits": [0,0,0,0,0,0,$TOTAL_COMMITS]
+        "labels": trend_labels,
+        "progress": trend_progress,
+        "commits": trend_commits
     }
 }
-JSONEOF
 
-echo "✅ データ生成完了: $OUTPUT_FILE"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+    json.dump(output, f, ensure_ascii=False, indent=2)
+
+print(f"✅ データ生成完了: {OUTPUT_FILE}")
+print(f"   プロジェクト: {len(projects)}, ツール: {sum(len(p['tools']) for p in projects)}, 進捗: {total_pct}%")
+PYEOF
