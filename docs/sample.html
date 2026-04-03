@@ -22,10 +22,10 @@
         .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
         .project-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
         .project-card:hover{border-color:var(--border-light)}
-        .tool-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;transition:background .15s}
+        .tool-item{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
         .tool-item:hover{background:rgba(0,0,0,0.02)}
         .tool-item:last-child{border-bottom:none}
-        .progress-thin{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+        .progress-thin{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
         .progress-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
         .badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px}
         .member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.04)}
@@ -234,7 +234,7 @@ function renderAll(d){
     // アラート
     const ac=document.getElementById('alerts-container');ac.innerHTML='';
     (d.alerts||[]).forEach(a=>{
-        const c={error:{border:'#c0392b',bg:'rgba(192,57,43,0.06)',text:'#c0392b'},warning:{border:'#c49a3c',bg:'rgba(196,154,60,0.06)',text:'#8b7355'},info:{border:'#7c6a4f',bg:'rgba(124,106,79,0.06)',text:'#7c6a4f'}};
+        const c={error:{border:'#c0392b',bg:'#fdf0ee',text:'#8b2318'},warning:{border:'#c49a3c',bg:'#fdf8ee',text:'#6b5525'},info:{border:'#7c6a4f',bg:'#f5f2ed',text:'#5c4d38'}};
         const s=c[a.type]||c.info;
         ac.innerHTML+=`<div class="alert-bar" style="border-color:${s.border};background:${s.bg};color:${s.text}">${a.message}</div>`;
     });
