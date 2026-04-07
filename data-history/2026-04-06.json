@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-07T02:24:17Z",
+  "generated_at": "2026-04-06T02:29:07Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -56,19 +56,59 @@
   "members": [],
   "recent_commits": [
     {
-      "author": "yamamoto-kosuke-ai",
+      "author": {
+        "login": "yamamoto-kosuke-ai",
+        "id": 247279877,
+        "node_id": "U_kgDODr0xBQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/247279877?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/yamamoto-kosuke-ai",
+        "html_url": "https://github.com/yamamoto-kosuke-ai",
+        "followers_url": "https://api.github.com/users/yamamoto-kosuke-ai/followers",
+        "following_url": "https://api.github.com/users/yamamoto-kosuke-ai/following{/other_user}",
+        "gists_url": "https://api.github.com/users/yamamoto-kosuke-ai/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/yamamoto-kosuke-ai/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/yamamoto-kosuke-ai/subscriptions",
+        "organizations_url": "https://api.github.com/users/yamamoto-kosuke-ai/orgs",
+        "repos_url": "https://api.github.com/users/yamamoto-kosuke-ai/repos",
+        "events_url": "https://api.github.com/users/yamamoto-kosuke-ai/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/yamamoto-kosuke-ai/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
       "repo": "direction-tool",
-      "message": "Embedding次元を3072→768に削減（DB容量75%削減）",
-      "date": "2026-04-06T00:09:15Z",
+      "message": "",
+      "date": "",
       "files": 2,
       "additions": 9,
       "deletions": 3
     },
     {
-      "author": "yamamoto-kosuke-ai",
+      "author": {
+        "login": "yamamoto-kosuke-ai",
+        "id": 247279877,
+        "node_id": "U_kgDODr0xBQ",
+        "avatar_url": "https://avatars.githubusercontent.com/u/247279877?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/yamamoto-kosuke-ai",
+        "html_url": "https://github.com/yamamoto-kosuke-ai",
+        "followers_url": "https://api.github.com/users/yamamoto-kosuke-ai/followers",
+        "following_url": "https://api.github.com/users/yamamoto-kosuke-ai/following{/other_user}",
+        "gists_url": "https://api.github.com/users/yamamoto-kosuke-ai/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/yamamoto-kosuke-ai/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/yamamoto-kosuke-ai/subscriptions",
+        "organizations_url": "https://api.github.com/users/yamamoto-kosuke-ai/orgs",
+        "repos_url": "https://api.github.com/users/yamamoto-kosuke-ai/repos",
+        "events_url": "https://api.github.com/users/yamamoto-kosuke-ai/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/yamamoto-kosuke-ai/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
       "repo": "direction-tool",
-      "message": "サムネイルをDB保存からVPSファイル保存に変更（DB容量削減）",
-      "date": "2026-04-06T00:02:48Z",
+      "message": "",
+      "date": "",
       "files": 1,
       "additions": 25,
       "deletions": 10
@@ -76,13 +116,13 @@
   ],
   "weekly_trend": {
     "labels": [
+      "03-31",
       "04-01",
       "04-02",
       "04-03",
       "04-04",
       "04-05",
-      "04-06",
-      "04-07"
+      "04-06"
     ],
     "progress": [
       0,
@@ -90,7 +130,7 @@
       0,
       0,
       0,
-      47,
+      0,
       47
     ],
     "commits": [
@@ -99,7 +139,7 @@
       0,
       0,
       0,
-      2,
+      0,
       2
     ]
   }
