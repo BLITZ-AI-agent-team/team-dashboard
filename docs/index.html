@@ -242,25 +242,25 @@ function renderAll(d){
     // Overview Projects（コンパクトカード）
     const op=document.getElementById('overview-projects');op.innerHTML='';
     d.projects.forEach(proj=>{
-        if(!proj.tools.length)return;
         const done=proj.tools.reduce((s,t)=>s+t.done,0);
         const total=proj.tools.reduce((s,t)=>s+t.total,0);
         const pct=total>0?Math.round(done/total*100):0;
         const assignees=[...new Set(proj.tools.map(t=>t.assignee).filter(Boolean))];
         const avatars=assignees.slice(0,3).map(a=>{const c=gc(a);return`<div class="avatar" style="background:${c.light};color:${c.text};width:24px;height:24px;font-size:10px;margin-left:-6px;border:2px solid var(--surface)">${sn(a).charAt(0).toUpperCase()}</div>`}).join('');
+        const toolLabel=proj.tools.length>0?proj.tools.length+' tools':'未設定';
         op.innerHTML+=`
         <div class="project-card" style="padding:16px 20px">
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-3">
                     <span class="text-sm font-semibold">${proj.name}</span>
-                    <span class="text-[11px]" style="color:var(--text3)">${proj.tools.length} tools</span>
+                    <span class="text-[11px]" style="color:var(--text3)">${toolLabel}</span>
                 </div>
                 <div class="flex items-center">${avatars?'<div class="flex items-center ml-2" style="padding-left:6px">'+avatars+'</div>':''}</div>
             </div>
             <div class="flex items-center gap-3">
                 <div class="flex-1 progress-thin"><div class="progress-fill" style="width:${pct}%;background:${pct>=80?'#5c8a6e':pct>0?'var(--accent)':'var(--border)'}"></div></div>
-                <span class="text-xs font-semibold" style="color:${pct>=80?'#5c8a6e':pct>0?'var(--text2)':'var(--text3)'}">${pct}%</span>
-                <span class="text-[11px]" style="color:var(--text3)">${done}/${total}</span>
+                <span class="text-xs font-semibold" style="color:${pct>=80?'#5c8a6e':pct>0?'var(--text2)':'var(--text3)'}">${total>0?pct+'%':'—'}</span>
+                <span class="text-[11px]" style="color:var(--text3)">${total>0?done+'/'+total:'タスク未登録'}</span>
             </div>
         </div>`;
     });
@@ -268,8 +268,10 @@ function renderAll(d){
     // Full Projects View
     const pf=document.getElementById('projects-full');pf.innerHTML='';let ti=0;
     d.projects.forEach(proj=>{
-        if(!proj.tools.length)return;
         let toolsHtml='';
+        if(!proj.tools.length){
+            toolsHtml=`<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">タスク未登録 — requirements.md を追加すると自動で反映されます</div>`;
+        }
         proj.tools.forEach(tool=>{
             const idx=ti++;
             const pct=tool.total>0?Math.round(tool.done/tool.total*100):0;
