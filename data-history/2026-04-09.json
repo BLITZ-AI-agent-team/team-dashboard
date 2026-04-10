@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-10T02:30:58Z",
+  "generated_at": "2026-04-09T02:11:40Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -10,7 +10,7 @@
     "active": 0,
     "total": 0
   },
-  "recent_commit_count": 0,
+  "recent_commit_count": 7,
   "alerts": [],
   "projects": [
     {
@@ -58,21 +58,85 @@
     }
   ],
   "members": [],
-  "recent_commits": [],
+  "recent_commits": [
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "drive-download",
+      "message": "撮影素材フォルダは共有済みである旨を注意事項に追記",
+      "date": "2026-04-08T09:00:57Z",
+      "files": 1,
+      "additions": 2,
+      "deletions": 1
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "drive-download",
+      "message": "サービスアカウント共有の注意事項を追加",
+      "date": "2026-04-08T09:00:00Z",
+      "files": 1,
+      "additions": 8,
+      "deletions": 0
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "drive-download",
+      "message": "不要な説明を削除（フォルダID解説、初回共有手順、File notFoundのFAQ）",
+      "date": "2026-04-08T08:59:28Z",
+      "files": 1,
+      "additions": 0,
+      "deletions": 26
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "drive-download",
+      "message": "Claude Code非ユーザー向けのターミナル実行手順を追加",
+      "date": "2026-04-08T08:54:57Z",
+      "files": 1,
+      "additions": 86,
+      "deletions": 0
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "drive-download",
+      "message": "セットアップガイドをClaude Codeコピペ式に改善",
+      "date": "2026-04-08T08:48:55Z",
+      "files": 1,
+      "additions": 22,
+      "deletions": 48
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "drive-download",
+      "message": "セットアップガイドを追加（共有時にそのまま送れる手順書）",
+      "date": "2026-04-08T08:37:24Z",
+      "files": 1,
+      "additions": 103,
+      "deletions": 0
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "drive-download",
+      "message": "Google Drive 選択的ダウンロードツール初版",
+      "date": "2026-04-08T08:35:15Z",
+      "files": 8,
+      "additions": 565,
+      "deletions": 0
+    }
+  ],
   "weekly_trend": {
     "labels": [
+      "04-03",
       "04-04",
       "04-05",
       "04-06",
       "04-07",
       "04-08",
-      "04-09",
-      "04-10"
+      "04-09"
     ],
     "progress": [
       0,
       0,
-      47,
+      0,
       47,
       47,
       47,
@@ -81,11 +145,11 @@
     "commits": [
       0,
       0,
+      0,
       2,
       2,
       0,
-      7,
-      0
+      7
     ]
   }
 }
