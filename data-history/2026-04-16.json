@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-17T02:32:29Z",
+  "generated_at": "2026-04-16T02:36:31Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -10,7 +10,7 @@
     "active": 0,
     "total": 0
   },
-  "recent_commit_count": 0,
+  "recent_commit_count": 2,
   "alerts": [],
   "projects": [
     {
@@ -58,16 +58,35 @@
     }
   ],
   "members": [],
-  "recent_commits": [],
+  "recent_commits": [
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "video-tool",
+      "message": ".agent-traceを誤ってコミットしたので削除＋gitignoreに追加",
+      "date": "2026-04-15T03:01:14Z",
+      "files": 4,
+      "additions": 2,
+      "deletions": 114
+    },
+    {
+      "author": "kawasumishuhei0117",
+      "repo": "video-tool",
+      "message": "Module 3（Video Reference）を追加、リポ名変更に対応",
+      "date": "2026-04-15T02:57:08Z",
+      "files": 19,
+      "additions": 1827,
+      "deletions": 127
+    }
+  ],
   "weekly_trend": {
     "labels": [
+      "04-10",
       "04-11",
       "04-12",
       "04-13",
       "04-14",
       "04-15",
-      "04-16",
-      "04-17"
+      "04-16"
     ],
     "progress": [
       47,
@@ -84,8 +103,8 @@
       0,
       0,
       0,
-      2,
-      0
+      0,
+      2
     ]
   }
 }
