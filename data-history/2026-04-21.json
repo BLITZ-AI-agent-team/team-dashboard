@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-22T02:31:44Z",
+  "generated_at": "2026-04-21T02:33:32Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -10,9 +10,13 @@
     "active": 0,
     "total": 0
   },
-  "recent_commit_count": 4,
+  "recent_commit_count": 0,
   "alerts": [],
   "projects": [
+    {
+      "name": "video-tool",
+      "tools": []
+    },
     {
       "name": "direction-tool",
       "tools": [
@@ -51,60 +55,19 @@
           ]
         }
       ]
-    },
-    {
-      "name": "video-tool",
-      "tools": []
     }
   ],
   "members": [],
-  "recent_commits": [
-    {
-      "author": "yamamoto-kosuke-ai",
-      "repo": "direction-tool",
-      "message": "n8n検索UIに検索Tips追加+エラー動画再処理スクリプト作成",
-      "date": "2026-04-21T09:15:30Z",
-      "files": 1,
-      "additions": 162,
-      "deletions": 0
-    },
-    {
-      "author": "yamamoto-kosuke-ai",
-      "repo": "direction-tool",
-      "message": "サムネスクリプトをスレッドセーフ化（Segfault/double free対策）",
-      "date": "2026-04-21T05:25:58Z",
-      "files": 2,
-      "additions": 17,
-      "deletions": 7
-    },
-    {
-      "author": "yamamoto-kosuke-ai",
-      "repo": "direction-tool",
-      "message": "サムネDL失敗リトライスクリプトと214エラー動画再処理プラン追加",
-      "date": "2026-04-21T05:04:06Z",
-      "files": 2,
-      "additions": 497,
-      "deletions": 0
-    },
-    {
-      "author": "yamamoto-kosuke-ai",
-      "repo": "direction-tool",
-      "message": "bulk_runnerにskip-list機能追加＋バックフィルスクリプト新規作成",
-      "date": "2026-04-21T04:49:13Z",
-      "files": 3,
-      "additions": 600,
-      "deletions": 13
-    }
-  ],
+  "recent_commits": [],
   "weekly_trend": {
     "labels": [
+      "04-15",
       "04-16",
       "04-17",
       "04-18",
       "04-19",
       "04-20",
-      "04-21",
-      "04-22"
+      "04-21"
     ],
     "progress": [
       47,
@@ -116,13 +79,13 @@
       47
     ],
     "commits": [
+      0,
       2,
       0,
       0,
       0,
       0,
-      0,
-      4
+      0
     ]
   }
 }
