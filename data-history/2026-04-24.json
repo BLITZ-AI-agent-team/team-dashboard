@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-25T02:25:33Z",
+  "generated_at": "2026-04-24T02:35:37Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -10,7 +10,7 @@
     "active": 0,
     "total": 0
   },
-  "recent_commit_count": 1,
+  "recent_commit_count": 7,
   "alerts": [],
   "projects": [
     {
@@ -62,22 +62,76 @@
     {
       "author": "yamamoto-kosuke-ai",
       "repo": "direction-tool",
-      "message": "夜間サムネ補完cronの安定化改善",
-      "date": "2026-04-24T03:37:36Z",
+      "message": "使用中止スクリプトをarchive/module6-scriptsに退避",
+      "date": "2026-04-23T06:45:21Z",
+      "files": 8,
+      "additions": 0,
+      "deletions": 0
+    },
+    {
+      "author": "yamamoto-kosuke-ai",
+      "repo": "direction-tool",
+      "message": "サムネ補完の夜間バッチ自動化設定を追加",
+      "date": "2026-04-23T05:39:48Z",
+      "files": 4,
+      "additions": 194,
+      "deletions": 0
+    },
+    {
+      "author": "yamamoto-kosuke-ai",
+      "repo": "direction-tool",
+      "message": "IPv4強制: IPv6経由のGoogle API接続が遅い問題への対策",
+      "date": "2026-04-23T02:59:54Z",
+      "files": 2,
+      "additions": 15,
+      "deletions": 2
+    },
+    {
+      "author": "yamamoto-kosuke-ai",
+      "repo": "direction-tool",
+      "message": "DLをhttplib2→requestsに切替: AuthorizedSession + ストリーミング",
+      "date": "2026-04-23T02:43:46Z",
+      "files": 2,
+      "additions": 53,
+      "deletions": 28
+    },
+    {
+      "author": "yamamoto-kosuke-ai",
+      "repo": "direction-tool",
+      "message": "socket timeout 180s→600s: 大容量動画のDL時間延長対応",
+      "date": "2026-04-23T01:33:13Z",
+      "files": 2,
+      "additions": 5,
+      "deletions": 4
+    },
+    {
+      "author": "yamamoto-kosuke-ai",
+      "repo": "direction-tool",
+      "message": "DLタイムアウト致命問題修正: socket default timeout 10s→180s",
+      "date": "2026-04-23T01:17:34Z",
       "files": 2,
       "additions": 10,
-      "deletions": 6
+      "deletions": 0
+    },
+    {
+      "author": "yamamoto-kosuke-ai",
+      "repo": "direction-tool",
+      "message": "FFmpegサムネ抽出タイムアウトを10秒→30秒に延長",
+      "date": "2026-04-23T00:04:50Z",
+      "files": 2,
+      "additions": 2,
+      "deletions": 2
     }
   ],
   "weekly_trend": {
     "labels": [
+      "04-18",
       "04-19",
       "04-20",
       "04-21",
       "04-22",
       "04-23",
-      "04-24",
-      "04-25"
+      "04-24"
     ],
     "progress": [
       47,
@@ -92,10 +146,10 @@
       0,
       0,
       0,
+      0,
       4,
       3,
-      7,
-      1
+      7
     ]
   }
 }
