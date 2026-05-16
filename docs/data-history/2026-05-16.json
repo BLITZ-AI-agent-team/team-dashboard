@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-16T02:36:31Z",
+  "generated_at": "2026-05-16T02:50:15Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -10,13 +10,9 @@
     "active": 0,
     "total": 0
   },
-  "recent_commit_count": 2,
+  "recent_commit_count": 0,
   "alerts": [],
   "projects": [
-    {
-      "name": "video-tool",
-      "tools": []
-    },
     {
       "name": "direction-tool",
       "tools": [
@@ -55,38 +51,23 @@
           ]
         }
       ]
+    },
+    {
+      "name": "video-tool",
+      "tools": []
     }
   ],
   "members": [],
-  "recent_commits": [
-    {
-      "author": "kawasumishuhei0117",
-      "repo": "video-tool",
-      "message": ".agent-traceを誤ってコミットしたので削除＋gitignoreに追加",
-      "date": "2026-04-15T03:01:14Z",
-      "files": 4,
-      "additions": 2,
-      "deletions": 114
-    },
-    {
-      "author": "kawasumishuhei0117",
-      "repo": "video-tool",
-      "message": "Module 3（Video Reference）を追加、リポ名変更に対応",
-      "date": "2026-04-15T02:57:08Z",
-      "files": 19,
-      "additions": 1827,
-      "deletions": 127
-    }
-  ],
+  "recent_commits": [],
   "weekly_trend": {
     "labels": [
-      "04-10",
-      "04-11",
-      "04-12",
-      "04-13",
-      "04-14",
-      "04-15",
-      "04-16"
+      "05-10",
+      "05-11",
+      "05-12",
+      "05-13",
+      "05-14",
+      "05-15",
+      "05-16"
     ],
     "progress": [
       47,
@@ -104,7 +85,7 @@
       0,
       0,
       0,
-      2
+      0
     ]
   }
 }
