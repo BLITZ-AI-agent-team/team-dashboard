@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-18T02:23:10Z",
+  "generated_at": "2026-05-18T03:37:10Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -13,10 +13,6 @@
   "recent_commit_count": 0,
   "alerts": [],
   "projects": [
-    {
-      "name": "video-tool",
-      "tools": []
-    },
     {
       "name": "direction-tool",
       "tools": [
@@ -55,19 +51,23 @@
           ]
         }
       ]
+    },
+    {
+      "name": "video-tool",
+      "tools": []
     }
   ],
   "members": [],
   "recent_commits": [],
   "weekly_trend": {
     "labels": [
-      "04-12",
-      "04-13",
-      "04-14",
-      "04-15",
-      "04-16",
-      "04-17",
-      "04-18"
+      "05-12",
+      "05-13",
+      "05-14",
+      "05-15",
+      "05-16",
+      "05-17",
+      "05-18"
     ],
     "progress": [
       47,
@@ -83,7 +83,7 @@
       0,
       0,
       0,
-      2,
+      0,
       0,
       0
     ]
