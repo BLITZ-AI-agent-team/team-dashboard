@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-25T02:25:33Z",
+  "generated_at": "2026-05-24T03:32:36Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -10,7 +10,7 @@
     "active": 0,
     "total": 0
   },
-  "recent_commit_count": 1,
+  "recent_commit_count": 0,
   "alerts": [],
   "projects": [
     {
@@ -58,26 +58,16 @@
     }
   ],
   "members": [],
-  "recent_commits": [
-    {
-      "author": "yamamoto-kosuke-ai",
-      "repo": "direction-tool",
-      "message": "夜間サムネ補完cronの安定化改善",
-      "date": "2026-04-24T03:37:36Z",
-      "files": 2,
-      "additions": 10,
-      "deletions": 6
-    }
-  ],
+  "recent_commits": [],
   "weekly_trend": {
     "labels": [
-      "04-19",
-      "04-20",
-      "04-21",
-      "04-22",
-      "04-23",
-      "04-24",
-      "04-25"
+      "05-18",
+      "05-19",
+      "05-20",
+      "05-21",
+      "05-22",
+      "05-23",
+      "05-24"
     ],
     "progress": [
       47,
@@ -92,10 +82,10 @@
       0,
       0,
       0,
-      4,
-      3,
-      7,
-      1
+      0,
+      0,
+      0,
+      0
     ]
   }
 }
