@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T03:51:03Z",
+  "generated_at": "2026-06-30T03:35:14Z",
   "team_health": "red",
   "total_progress": {
     "done": 11,
@@ -61,13 +61,13 @@
   "recent_commits": [],
   "weekly_trend": {
     "labels": [
-      "06-23",
       "06-24",
       "06-25",
       "06-26",
       "06-27",
       "06-28",
-      "06-29"
+      "06-29",
+      "06-30"
     ],
     "progress": [
       47,
